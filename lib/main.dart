@@ -12,11 +12,17 @@ class VotingApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final ThemeData theme = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.red,
+      ),
+      useMaterial3: true,
+    );
+
     return MaterialApp(
       title: "Xchange",
-      theme: ThemeData.dark(
-        useMaterial3: true,
-      ),
+      theme: theme,
       home: const ExchangePage(),
     );
   }
