@@ -40,7 +40,8 @@ class ExchangePage extends StatelessWidget {
                             style: Fonts.neueMedium(15),
                           ),
                           const SizedBox(width: 5),
-                          const Icon(Icons.info_outline) // TODO make this do something
+                          const Icon(
+                              Icons.info_outline) // TODO make this do something
                         ],
                       ),
                     ],
@@ -71,8 +72,9 @@ class ExchangePage extends StatelessWidget {
                     children: [
                       const Expanded(child: SizedBox()),
                       const CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/383px-Flag_of_the_United_Kingdom_%281-2%29.svg.png")),
+                        backgroundImage: NetworkImage(
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/383px-Flag_of_the_United_Kingdom_%281-2%29.svg.png"),
+                      ),
                       const SizedBox(width: 15),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,8 +98,9 @@ class ExchangePage extends StatelessWidget {
                       ),
                       const SizedBox(width: 15),
                       const CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              "https://cdn.britannica.com/33/4833-004-828A9A84/Flag-United-States-of-America.jpg")),
+                        backgroundImage: NetworkImage(
+                            "https://cdn.britannica.com/33/4833-004-828A9A84/Flag-United-States-of-America.jpg"),
+                      ),
                       const Expanded(child: SizedBox()),
                     ],
                   ),
@@ -123,29 +126,50 @@ class ExchangePage extends StatelessWidget {
                 KeyboardButton(Icons.keyboard_backspace),
               ],
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    child: FilledButton(
-                      onPressed: () => nav.push(MaterialPageRoute(builder: (_) => const ExchangePreviewPage())),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: Text(
-                          "Preview Exchange",
-                          style: Fonts.neueBold(16),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            const ContinueButton(
+              label: "Preview Exchange",
+              destination: ExchangePreviewPage(),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class ContinueButton extends StatelessWidget {
+  const ContinueButton({
+    super.key,
+    required this.label,
+    required this.destination,
+  });
+
+  final String label;
+  final Widget destination;
+
+  @override
+  Widget build(BuildContext context) {
+    final NavigatorState nav = Navigator.of(context);
+
+    return Row(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: FilledButton(
+              onPressed: () =>
+                  nav.push(MaterialPageRoute(builder: (_) => destination)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                child: Text(
+                  label,
+                  style: Fonts.neueBold(16),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

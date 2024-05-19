@@ -1,14 +1,14 @@
-import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 
 import "../../../fonts.dart";
+import "../exchange_page/exchange_page.dart";
+import "../exchange_success_page/exchange_success_page.dart";
 
 class ExchangePreviewPage extends StatelessWidget {
   const ExchangePreviewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     final NavigatorState nav = Navigator.of(context);
 
     return Scaffold(
@@ -37,15 +37,7 @@ class ExchangePreviewPage extends StatelessWidget {
               style: Fonts.neueMedium(30),
             ),
             const SizedBox(height: 50),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Divider(
-                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.2) ??
-                    Colors.black,
-                height: 1,
-                thickness: 1,
-              ),
-            ),
+            const MyDivider(),
             const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 45),
@@ -112,9 +104,35 @@ class ExchangePreviewPage extends StatelessWidget {
                   ),
                 ],
               ),
-            )
+            ),
+            const Expanded(child: SizedBox()),
+            const ContinueButton(
+              label: "Exchange Now",
+              destination: ExchangeSuccessPage(),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class MyDivider extends StatelessWidget {
+  const MyDivider({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Divider(
+        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.2) ??
+            Colors.black,
+        height: 1,
+        thickness: 1,
       ),
     );
   }
