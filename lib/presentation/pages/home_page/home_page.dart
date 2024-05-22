@@ -45,7 +45,7 @@ class HomePage extends StatelessWidget {
                         children: [
                           Text("£257.28 GBP", style: Fonts.neueMedium(15)),
                           Text("£257.28 GBP", style: Fonts.neueLight(15)),
-                        ],
+                        ],        
                       ),
                     ],
                   ),
