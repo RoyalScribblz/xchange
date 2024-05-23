@@ -2,10 +2,16 @@ import "package:flutter/material.dart";
 
 import "../../../fonts.dart";
 import "../exchange_page/exchange_page.dart";
-import "../home_page/home_page.dart";
 
-class ExchangeSuccessPage extends StatelessWidget {
-  const ExchangeSuccessPage({super.key});
+class SuccessPage extends StatelessWidget {
+  const SuccessPage({
+    super.key,
+    required this.mainText,
+    required this.subText,
+  });
+
+  final String mainText;
+  final String subText;
 
   @override
   Widget build(BuildContext context) {
@@ -16,17 +22,17 @@ class ExchangeSuccessPage extends StatelessWidget {
             const Expanded(child: SizedBox()),
             const Icon(Icons.check_circle, size: 150),
             Text(
-              "Converted £75.00 GBP to",
+              mainText,
               style: Fonts.neueMedium(20),
             ),
             Text(
-              "\$95.28 USD",
+              subText,
               style: Fonts.neueBold(30),
             ),
             const Expanded(child: SizedBox()),
             const ContinueButton(
               label: "Return Home",
-              destination: HomePage(),
+              destination: null,
             ),
           ],
         ),

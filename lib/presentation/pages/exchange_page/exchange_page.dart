@@ -24,7 +24,7 @@ class ExchangePage extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: () => {},
+                    onPressed: () => nav.pop(),
                   ),
                 ),
                 Align(
@@ -93,7 +93,7 @@ class ExchangePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("To", style: Fonts.neueLight(15)),
-                          Text("USD (\$)", style: Fonts.neueMedium(15)),
+                          Text(r"USD ($)", style: Fonts.neueMedium(15)),
                         ],
                       ),
                       const SizedBox(width: 15),
@@ -145,7 +145,7 @@ class ContinueButton extends StatelessWidget {
   });
 
   final String label;
-  final Widget destination;
+  final Widget? destination;
 
   @override
   Widget build(BuildContext context) {
@@ -157,8 +157,13 @@ class ContinueButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: FilledButton(
-              onPressed: () =>
-                  nav.push(MaterialPageRoute(builder: (_) => destination)),
+              onPressed: () async {
+                if (destination != null) {
+                  await nav.push(MaterialPageRoute(builder: (_) => destination!));
+                }
+
+                nav.popUntil((route) => route.isFirst);
+              },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 child: Text(

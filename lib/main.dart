@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "presentation/pages/currency_page/currency_page.dart";
+import "presentation/pages/home_page/home_page.dart";
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,7 @@ class VotingApp extends StatelessWidget {
     return MaterialApp(
       title: "Xchange",
       theme: theme,
-      home: const CurrencyPage(),
+      home: const HomePage(),
     );
   }
 }

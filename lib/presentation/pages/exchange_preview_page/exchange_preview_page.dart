@@ -108,7 +108,10 @@ class ExchangePreviewPage extends StatelessWidget {
             const Expanded(child: SizedBox()),
             const ContinueButton(
               label: "Exchange Now",
-              destination: ExchangeSuccessPage(),
+              destination: SuccessPage(
+                mainText: "Converted £75.00 GBP to",
+                subText: r"$95.28 USD",
+              ),
             ),
           ],
         ),
@@ -129,8 +132,8 @@ class MyDivider extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Divider(
-        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.2) ??
-            Colors.black,
+        color:
+            theme.textTheme.bodyMedium?.color?.withOpacity(0.2) ?? Colors.black,
         height: 1,
         thickness: 1,
       ),
