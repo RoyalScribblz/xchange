@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  final credentials = await auth0.webAuthentication().login();
+                  final credentials = await auth0.webAuthentication(scheme: "xchange").login();
 
                   setState(() {
                     _credentials = credentials;

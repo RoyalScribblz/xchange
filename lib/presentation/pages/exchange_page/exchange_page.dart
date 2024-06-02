@@ -1,6 +1,4 @@
-import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
-import "package:flutter/widgets.dart";
 
 import "../../../fonts.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
