@@ -1,18 +1,36 @@
 import "dart:core";
 
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 
+import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
+import "../../controllers/accounts_cubit.dart";
+import "../common/spaced_column.dart";
 import "../deposit_page/deposit_page.dart";
 import "../exchange_page/exchange_page.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
 import "../withdraw_page/withdraw_page.dart";
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AccountsCubit>().update();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final List<GetAccountsResponse> accounts =
+        context.watch<AccountsCubit>().state;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -56,20 +74,20 @@ class HomePage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const CurrencyTile(
-                    countryFlagImagePath:
-                        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/383px-Flag_of_the_United_Kingdom_%281-2%29.svg.png",
-                    currencyCode: "GBP",
-                    currencyAmount: "£257.28 GBP",
-                    localCurrencyAmount: "£257.28 GBP",
-                  ),
-                  const SizedBox(height: 15),
-                  const CurrencyTile(
-                    countryFlagImagePath:
-                        "https://cdn.britannica.com/33/4833-004-828A9A84/Flag-United-States-of-America.jpg",
-                    currencyCode: "USD",
-                    currencyAmount: "£95.28 USD",
-                    localCurrencyAmount: "£74.17 GBP",
+                  SpacedColumn(
+                    spaceHeight: 15,
+                    children: [
+                      for (var account in accounts)
+                        CurrencyTile(
+                          countryFlagImagePath: account.currency.flagImageUrl,
+                          currencyCode: account.currency.currencyCode,
+                          currencyAmount: account.balance,
+                          currencySymbol: account.currency.symbol,
+                          localCurrencyCode: "GBP",
+                          localCurrencyAmount: account.currency.localValue,
+                          localCurrencySymbol: "£",
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -87,13 +105,19 @@ class CurrencyTile extends StatefulWidget {
     required this.countryFlagImagePath,
     required this.currencyCode,
     required this.currencyAmount,
+    required this.currencySymbol,
+    required this.localCurrencyCode,
     required this.localCurrencyAmount,
+    required this.localCurrencySymbol,
   });
 
   final String countryFlagImagePath;
   final String currencyCode;
-  final String currencyAmount;
-  final String localCurrencyAmount;
+  final double currencyAmount;
+  final String currencySymbol;
+  final String localCurrencyCode;
+  final double localCurrencyAmount;
+  final String localCurrencySymbol;
 
   @override
   State<CurrencyTile> createState() => _CurrencyTileState();
@@ -122,8 +146,8 @@ class _CurrencyTileState extends State<CurrencyTile> {
               const Expanded(child: SizedBox()),
               Column(
                 children: [
-                  Text(widget.currencyAmount, style: Fonts.neueMedium(15)),
-                  Text(widget.localCurrencyAmount, style: Fonts.neueLight(15)),
+                  Text("${widget.currencySymbol}${widget.currencyAmount.toStringAsFixed(2)} ${widget.currencyCode}", style: Fonts.neueMedium(15)),
+                  Text("${widget.localCurrencySymbol}${widget.localCurrencyAmount.toStringAsFixed(2)} ${widget.localCurrencyCode}", style: Fonts.neueLight(15)),
                 ],
               ),
             ],

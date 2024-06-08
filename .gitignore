@@ -31,6 +31,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+# G-generated files
+*.g.dart
+
 # Symbolication related
 app.*.symbols
 

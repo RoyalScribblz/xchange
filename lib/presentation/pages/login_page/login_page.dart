@@ -1,6 +1,8 @@
 import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 
+import "../../controllers/accounts_cubit.dart";
 import "../home_page/home_page.dart";
 
 class LoginPage extends StatefulWidget {
@@ -33,7 +35,8 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  final credentials = await auth0.webAuthentication(scheme: "xchange").login();
+                  final credentials =
+                      await auth0.webAuthentication(scheme: "xchange").login();
 
                   setState(() {
                     _credentials = credentials;
@@ -47,6 +50,9 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    return const HomePage();
+    return BlocProvider(
+      create: (_) => AccountsCubit(),
+      child: const HomePage(),
+    );
   }
 }
