@@ -1,0 +1,97 @@
+import "package:flutter/cupertino.dart";
+import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+
+import "../../../data/dtos/currency.dart";
+import "../../../fonts.dart";
+import "../../controllers/currencies_cubit.dart";
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<CurrenciesCubit>().update();
+  }
+
+  String selectedCurrency = "6c84631c-838b-403e-8e2b-38614d2e907d";
+
+  @override
+  Widget build(BuildContext context) {
+    final NavigatorState nav = Navigator.of(context);
+    final List<Currency> currencies = context.watch<CurrenciesCubit>().state;
+
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: const Icon(Icons.keyboard_backspace),
+                    onPressed: () => nav.pop(),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Profile",
+                    style: Fonts.neueBold(15),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Local Currency", style: Fonts.neueMedium(15)),
+                  const SizedBox(height: 15),
+                  SizedBox(
+                    height: 60,
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: selectedCurrency,
+                      items: [
+                        for (var currency in currencies)
+                          DropdownMenuItem(
+                            value: currency.currencyId,
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(currency.flagImageUrl),
+                                ),
+                                const SizedBox(width: 5),
+                                Text("${currency.name} (${currency.symbol})"),
+                              ],
+                            ),
+                          ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedCurrency = value);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

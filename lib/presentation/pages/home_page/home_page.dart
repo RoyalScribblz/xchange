@@ -6,10 +6,12 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
+import "../../controllers/currencies_cubit.dart";
 import "../common/spaced_column.dart";
 import "../deposit_page/deposit_page.dart";
 import "../exchange_page/exchange_page.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
+import "../profile_page/profile_page.dart";
 import "../withdraw_page/withdraw_page.dart";
 
 class HomePage extends StatefulWidget {
@@ -31,6 +33,8 @@ class _HomePageState extends State<HomePage> {
     final List<GetAccountsResponse> accounts =
         context.watch<AccountsCubit>().state;
 
+    final NavigatorState nav = Navigator.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -42,7 +46,14 @@ class _HomePageState extends State<HomePage> {
                   alignment: Alignment.centerLeft,
                   child: IconButton(
                     icon: const Icon(Icons.person_outline),
-                    onPressed: () => {},
+                    onPressed: () => nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => CurrenciesCubit(),
+                          child: const ProfilePage(),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Align(
@@ -84,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                           currencyAmount: account.balance,
                           currencySymbol: account.currency.symbol,
                           localCurrencyCode: "GBP",
-                          localCurrencyAmount: account.currency.localValue,
+                          localCurrencyAmount: account.localValue,
                           localCurrencySymbol: "£",
                         ),
                     ],
@@ -146,8 +157,12 @@ class _CurrencyTileState extends State<CurrencyTile> {
               const Expanded(child: SizedBox()),
               Column(
                 children: [
-                  Text("${widget.currencySymbol}${widget.currencyAmount.toStringAsFixed(2)} ${widget.currencyCode}", style: Fonts.neueMedium(15)),
-                  Text("${widget.localCurrencySymbol}${widget.localCurrencyAmount.toStringAsFixed(2)} ${widget.localCurrencyCode}", style: Fonts.neueLight(15)),
+                  Text(
+                      "${widget.currencySymbol}${widget.currencyAmount.toStringAsFixed(2)} ${widget.currencyCode}",
+                      style: Fonts.neueMedium(15)),
+                  Text(
+                      "${widget.localCurrencySymbol}${widget.localCurrencyAmount.toStringAsFixed(2)} ${widget.localCurrencyCode}",
+                      style: Fonts.neueLight(15)),
                 ],
               ),
             ],
