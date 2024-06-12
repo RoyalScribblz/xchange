@@ -1,4 +1,6 @@
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+import "presentation/controllers/user_cubit.dart";
 import "presentation/pages/login_page/login_page.dart";
 
 Future main() async {
@@ -12,7 +14,6 @@ class VotingApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final ThemeData theme = ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: Colors.red,
@@ -23,7 +24,10 @@ class VotingApp extends StatelessWidget {
     return MaterialApp(
       title: "Xchange",
       theme: theme,
-      home: const LoginPage(),
+      home: BlocProvider(
+        create: (_) => UserCubit(),
+        child: const LoginPage(),
+      ),
     );
   }
 }

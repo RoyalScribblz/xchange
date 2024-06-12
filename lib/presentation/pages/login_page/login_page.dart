@@ -3,6 +3,8 @@ import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../controllers/accounts_cubit.dart";
+import "../../controllers/cubit_models/user.dart";
+import "../../controllers/user_cubit.dart";
 import "../home_page/home_page.dart";
 
 class LoginPage extends StatefulWidget {
@@ -13,8 +15,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  Credentials? _credentials;
-
   late Auth0 auth0;
 
   @override
@@ -28,7 +28,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_credentials == null) {
+    final UserCubit userCubit = context.watch<UserCubit>();
+
+    if (userCubit.state.credentials == null) {
       return Scaffold(
         body: SafeArea(
           child: Column(
@@ -38,9 +40,7 @@ class _LoginPageState extends State<LoginPage> {
                   final credentials =
                       await auth0.webAuthentication(scheme: "xchange").login();
 
-                  setState(() {
-                    _credentials = credentials;
-                  });
+                  await userCubit.login(credentials);
                 },
                 child: const Text("Login"),
               )
@@ -49,6 +49,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     }
+
+    // if (userCubit.state.user == null) {
+    // TODO account creation page
+    // }
 
     return BlocProvider(
       create: (_) => AccountsCubit(),
