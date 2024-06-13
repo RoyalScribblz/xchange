@@ -5,6 +5,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "../../../data/dtos/currency.dart";
 import "../../../fonts.dart";
 import "../../controllers/currencies_cubit.dart";
+import "../../controllers/user_cubit.dart";
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -27,6 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final NavigatorState nav = Navigator.of(context);
     final List<Currency> currencies = context.watch<CurrenciesCubit>().state;
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     return Scaffold(
       body: SafeArea(
@@ -89,6 +91,29 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    child: FilledButton(
+                      onPressed: () async {
+                        await userCubit.updateLocalCurrency(selectedCurrency);
+
+                        nav.pop();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          "Save",
+                          style: Fonts.neueBold(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
