@@ -54,9 +54,6 @@ class _LoginPageState extends State<LoginPage> {
     // TODO account creation page
     // }
 
-    return BlocProvider(
-      create: (_) => AccountsCubit(),
-      child: const HomePage(),
-    );
+    return const HomePage();
   }
 }

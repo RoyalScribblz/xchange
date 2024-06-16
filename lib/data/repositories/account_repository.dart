@@ -8,7 +8,6 @@ class AccountRepository {
     final response = await http.get(
       Uri.http("10.0.2.2:5230", "accounts", {
         "userId": userId,
-        "localCurrencyId": "3ca59b04-be8a-4344-90d2-5d78c5009da6",
       }),
       headers: {
         "Access-Control-Allow-Origin": "*",

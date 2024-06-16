@@ -4,6 +4,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../../data/dtos/currency.dart";
 import "../../../fonts.dart";
+import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/user_cubit.dart";
 
@@ -20,6 +21,9 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
 
     context.read<CurrenciesCubit>().update();
+
+    selectedCurrency =
+        context.read<UserCubit>().state.user!.localCurrency.currencyId;
   }
 
   String selectedCurrency = "6c84631c-838b-403e-8e2b-38614d2e907d";
@@ -27,8 +31,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final NavigatorState nav = Navigator.of(context);
-    final List<Currency> currencies = context.watch<CurrenciesCubit>().state;
+    final CurrenciesCubit currenciesCubit = context.watch<CurrenciesCubit>();
     final UserCubit userCubit = context.watch<UserCubit>();
+    final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
 
     return Scaffold(
       body: SafeArea(
@@ -67,13 +72,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       isExpanded: true,
                       value: selectedCurrency,
                       items: [
-                        for (var currency in currencies)
+                        for (var currency in currenciesCubit.state)
                           DropdownMenuItem(
                             value: currency.currencyId,
                             child: Row(
                               children: [
                                 CircleAvatar(
-                                  backgroundImage: NetworkImage(currency.flagImageUrl),
+                                  backgroundImage:
+                                      NetworkImage(currency.flagImageUrl),
                                 ),
                                 const SizedBox(width: 5),
                                 Text("${currency.name} (${currency.symbol})"),
@@ -91,14 +97,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
+            const Expanded(child: SizedBox()),
             Row(
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
                     child: FilledButton(
                       onPressed: () async {
                         await userCubit.updateLocalCurrency(selectedCurrency);
+                        await accountsCubit.update();
 
                         nav.pop();
                       },

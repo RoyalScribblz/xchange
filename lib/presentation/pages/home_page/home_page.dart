@@ -7,6 +7,7 @@ import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
+import "../../controllers/user_cubit.dart";
 import "../common/spaced_column.dart";
 import "../deposit_page/deposit_page.dart";
 import "../exchange_page/exchange_page.dart";
@@ -30,8 +31,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<GetAccountsResponse> accounts =
-        context.watch<AccountsCubit>().state;
+    final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     final NavigatorState nav = Navigator.of(context);
 
@@ -48,10 +49,7 @@ class _HomePageState extends State<HomePage> {
                     icon: const Icon(Icons.person_outline),
                     onPressed: () => nav.push(
                       MaterialPageRoute(
-                        builder: (_) => BlocProvider(
-                          create: (_) => CurrenciesCubit(),
-                          child: const ProfilePage(),
-                        ),
+                        builder: (_) => const ProfilePage(),
                       ),
                     ),
                   ),
@@ -88,15 +86,15 @@ class _HomePageState extends State<HomePage> {
                   SpacedColumn(
                     spaceHeight: 15,
                     children: [
-                      for (var account in accounts)
+                      for (var account in accountsCubit.state)
                         CurrencyTile(
                           countryFlagImagePath: account.currency.flagImageUrl,
                           currencyCode: account.currency.currencyCode,
                           currencyAmount: account.balance,
                           currencySymbol: account.currency.symbol,
-                          localCurrencyCode: "GBP",
+                          localCurrencyCode: userCubit.state.user!.localCurrency.currencyCode,
                           localCurrencyAmount: account.localValue,
-                          localCurrencySymbol: "£",
+                          localCurrencySymbol: userCubit.state.user!.localCurrency.symbol,
                         ),
                     ],
                   ),

@@ -41,7 +41,7 @@ class UserRepository {
   }
 
   static Future<Currency?> setLocalCurrency(String userId, String currencyId) async {
-    final response = await http.post(
+    final response = await http.patch(
       Uri.http(
         "10.0.2.2:5230",
         "user/$userId/localCurrency",
