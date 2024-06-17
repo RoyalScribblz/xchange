@@ -7,6 +7,7 @@ import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
+import "../../controllers/deposit_cubit.dart";
 import "../../controllers/user_cubit.dart";
 import "../common/spaced_column.dart";
 import "../deposit_page/deposit_page.dart";
@@ -26,7 +27,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    context.read<AccountsCubit>().update();
+    final UserCubit userCubit = context.read<UserCubit>();
+    context.read<AccountsCubit>().update(userCubit.state.user!.userId);
   }
 
   @override
@@ -92,9 +94,11 @@ class _HomePageState extends State<HomePage> {
                           currencyCode: account.currency.currencyCode,
                           currencyAmount: account.balance,
                           currencySymbol: account.currency.symbol,
-                          localCurrencyCode: userCubit.state.user!.localCurrency.currencyCode,
+                          localCurrencyCode:
+                              userCubit.state.user!.localCurrency.currencyCode,
                           localCurrencyAmount: account.localValue,
-                          localCurrencySymbol: userCubit.state.user!.localCurrency.symbol,
+                          localCurrencySymbol:
+                              userCubit.state.user!.localCurrency.symbol,
                         ),
                     ],
                   ),
@@ -190,7 +194,13 @@ class _CurrencyTileState extends State<CurrencyTile> {
                     style: IconButton.styleFrom(
                         backgroundColor: theme.textTheme.bodyMedium?.color),
                     onPressed: () async => await nav.push(
-                        MaterialPageRoute(builder: (_) => const DepositPage())),
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => DepositCubit(),
+                          child: const DepositPage(),
+                        ),
+                      ),
+                    ),
                     icon: const Icon(Icons.download),
                   ),
                   const Text("Deposit"),

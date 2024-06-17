@@ -107,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: FilledButton(
                       onPressed: () async {
                         await userCubit.updateLocalCurrency(selectedCurrency);
-                        await accountsCubit.update();
+                        await accountsCubit.update(userCubit.state.user!.userId);
 
                         nav.pop();
                       },
