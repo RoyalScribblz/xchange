@@ -106,12 +106,18 @@ class ExchangePreviewPage extends StatelessWidget {
               ),
             ),
             const Expanded(child: SizedBox()),
-            const ContinueButton(
+            ContinueButton(
               label: "Exchange Now",
-              destination: SuccessPage(
-                mainText: "Converted £75.00 GBP to",
-                subText: r"$95.28 USD",
-              ),
+              onPressed: () async => {
+                await nav.push(
+                  MaterialPageRoute(
+                    builder: (_) => const SuccessPage(
+                      mainText: "Converted £75.00 GBP to",
+                      subText: r"$95.28 USD",
+                    ),
+                  ),
+                ),
+              },
             ),
           ],
         ),

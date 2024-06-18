@@ -4,6 +4,7 @@ import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../../data/contracts/get_accounts_response.dart";
+import "../../../data/contracts/get_user_response.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
@@ -90,15 +91,8 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       for (var account in accountsCubit.state)
                         CurrencyTile(
-                          countryFlagImagePath: account.currency.flagImageUrl,
-                          currencyCode: account.currency.currencyCode,
-                          currencyAmount: account.balance,
-                          currencySymbol: account.currency.symbol,
-                          localCurrencyCode:
-                              userCubit.state.user!.localCurrency.currencyCode,
-                          localCurrencyAmount: account.localValue,
-                          localCurrencySymbol:
-                              userCubit.state.user!.localCurrency.symbol,
+                          account: account,
+                          user: userCubit.state.user!,
                         ),
                     ],
                   ),
@@ -115,22 +109,12 @@ class _HomePageState extends State<HomePage> {
 class CurrencyTile extends StatefulWidget {
   const CurrencyTile({
     super.key,
-    required this.countryFlagImagePath,
-    required this.currencyCode,
-    required this.currencyAmount,
-    required this.currencySymbol,
-    required this.localCurrencyCode,
-    required this.localCurrencyAmount,
-    required this.localCurrencySymbol,
+    required this.account,
+    required this.user,
   });
 
-  final String countryFlagImagePath;
-  final String currencyCode;
-  final double currencyAmount;
-  final String currencySymbol;
-  final String localCurrencyCode;
-  final double localCurrencyAmount;
-  final String localCurrencySymbol;
+  final GetAccountsResponse account;
+  final GetUserResponse user;
 
   @override
   State<CurrencyTile> createState() => _CurrencyTileState();
@@ -152,18 +136,18 @@ class _CurrencyTileState extends State<CurrencyTile> {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(widget.countryFlagImagePath),
+                backgroundImage: NetworkImage(widget.account.currency.flagImageUrl),
               ),
               const SizedBox(width: 15),
-              Text(widget.currencyCode, style: Fonts.neueBold(20)),
+              Text(widget.account.currency.currencyCode, style: Fonts.neueBold(20)),
               const Expanded(child: SizedBox()),
               Column(
                 children: [
                   Text(
-                      "${widget.currencySymbol}${widget.currencyAmount.toStringAsFixed(2)} ${widget.currencyCode}",
+                      "${widget.account.currency.symbol}${widget.account.balance.toStringAsFixed(2)} ${widget.account.currency.currencyCode}",
                       style: Fonts.neueMedium(15)),
                   Text(
-                      "${widget.localCurrencySymbol}${widget.localCurrencyAmount.toStringAsFixed(2)} ${widget.localCurrencyCode}",
+                      "${widget.user.localCurrency.symbol}${widget.account.localValue.toStringAsFixed(2)} ${widget.user.localCurrency.currencyCode}",
                       style: Fonts.neueLight(15)),
                 ],
               ),
@@ -197,7 +181,7 @@ class _CurrencyTileState extends State<CurrencyTile> {
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
                           create: (_) => DepositCubit(),
-                          child: const DepositPage(),
+                          child: DepositPage(account: widget.account),
                         ),
                       ),
                     ),
@@ -213,7 +197,7 @@ class _CurrencyTileState extends State<CurrencyTile> {
                     style: IconButton.styleFrom(
                         backgroundColor: theme.textTheme.bodyMedium?.color),
                     onPressed: () async => await nav.push(MaterialPageRoute(
-                        builder: (_) => const WithdrawPage())),
+                        builder: (_) => WithdrawPage(account: widget.account))),
                     icon: const Icon(Icons.upload),
                   ),
                   const Text("Withdraw"),

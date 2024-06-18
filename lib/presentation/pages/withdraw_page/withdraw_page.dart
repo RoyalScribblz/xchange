@@ -1,15 +1,21 @@
 import "package:flutter/material.dart";
 
+import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
+import "../../controllers/accounts_cubit.dart";
 import "../exchange_page/exchange_page.dart";
 import "../exchange_success_page/exchange_success_page.dart";
 
 class WithdrawPage extends StatelessWidget {
-  const WithdrawPage({super.key});
+  const WithdrawPage({super.key, required this.account});
+
+  final GetAccountsResponse account;
 
   @override
   Widget build(BuildContext context) {
     final NavigatorState nav = Navigator.of(context);
+    // final WithdrawCubit depositCubit = context.watch<WithdrawCubit>();
+    // final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
 
     return Scaffold(
       body: SafeArea(
@@ -82,12 +88,41 @@ class WithdrawPage extends StatelessWidget {
               ),
             ),
             const Expanded(child: SizedBox()),
-            const ContinueButton(
+            ContinueButton(
               label: "Confirm Withdrawal",
-              destination: SuccessPage(
-                mainText: "Withdraw Successful",
-                subText: r"£100.00 GBP",
-              ),
+              onPressed: () async {
+                // final bool success = await accountsCubit.withdraw(
+                //     account.accountId, depositCubit.state.amount);
+                //
+                // if (success) {
+                //   await nav.push(
+                //     MaterialPageRoute(
+                //       builder: (_) => const SuccessPage(
+                //         mainText: "Deposit Successful",
+                //         subText: "£${account.currency.symbol}${depositCubit.state.amount.toStringAsFixed(2)} ${account.currency.currencyCode}",
+                //       ),
+                //     ),
+                //   );
+                //   return;
+                // }
+
+                if (context.mounted) {
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("ERROR"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
             ),
           ],
         ),

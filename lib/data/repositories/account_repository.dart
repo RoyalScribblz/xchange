@@ -25,4 +25,23 @@ class AccountRepository {
 
     return [];
   }
+
+  static Future<GetAccountsResponse?> deposit(String accountId, double amount) async {
+    final response = await http.patch(
+      Uri.http("10.0.2.2:5230", "account/$accountId/deposit", {
+        "amount": amount.toString(),
+      }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Accept": "*/*"
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return GetAccountsResponse.fromJson(json.decode(response.body));
+    }
+
+    return null;
+  }
 }

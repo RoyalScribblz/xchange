@@ -124,9 +124,11 @@ class ExchangePage extends StatelessWidget {
                 KeyboardButton(Icons.keyboard_backspace),
               ],
             ),
-            const ContinueButton(
+            ContinueButton(
               label: "Preview Exchange",
-              destination: ExchangePreviewPage(),
+              onPressed: () async => {
+                await nav.push(MaterialPageRoute(builder: (_) => const ExchangePreviewPage()))
+              },
             ),
           ],
         ),
@@ -139,15 +141,14 @@ class ContinueButton extends StatelessWidget {
   const ContinueButton({
     super.key,
     required this.label,
-    required this.destination,
+    required this.onPressed,
   });
 
   final String label;
-  final Widget? destination;
+  final Function() onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final NavigatorState nav = Navigator.of(context);
 
     return Row(
       children: [
@@ -155,13 +156,7 @@ class ContinueButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: FilledButton(
-              onPressed: () async {
-                if (destination != null) {
-                  await nav.push(MaterialPageRoute(builder: (_) => destination!));
-                }
-
-                nav.popUntil((route) => route.isFirst);
-              },
+              onPressed: onPressed,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 child: Text(

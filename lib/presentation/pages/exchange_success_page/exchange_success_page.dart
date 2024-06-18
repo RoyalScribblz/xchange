@@ -30,9 +30,11 @@ class SuccessPage extends StatelessWidget {
               style: Fonts.neueBold(30),
             ),
             const Expanded(child: SizedBox()),
-            const ContinueButton(
+            ContinueButton(
               label: "Return Home",
-              destination: null,
+              onPressed: () => {
+                Navigator.of(context).popUntil((route) => route.isFirst)
+              },
             ),
           ],
         ),
