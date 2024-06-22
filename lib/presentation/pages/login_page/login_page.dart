@@ -4,6 +4,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/cubit_models/user.dart";
+import "../../controllers/home_page_cubit.dart";
 import "../../controllers/user_cubit.dart";
 import "../home_page/home_page.dart";
 
@@ -54,6 +55,9 @@ class _LoginPageState extends State<LoginPage> {
     // TODO account creation page
     // }
 
-    return const HomePage();
+    return BlocProvider(
+      create: (_) => HomePageCubit(),
+      child: const HomePage(),
+    );
   }
 }

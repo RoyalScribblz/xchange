@@ -5,11 +5,13 @@ import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../../data/contracts/get_accounts_response.dart";
 import "../../../data/contracts/get_user_response.dart";
+import "../../../data/dtos/currency.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/deposit_cubit.dart";
 import "../../controllers/exchange_cubit.dart";
+import "../../controllers/home_page_cubit.dart";
 import "../../controllers/user_cubit.dart";
 import "../../controllers/withdraw_cubit.dart";
 import "../common/spaced_column.dart";
@@ -32,12 +34,14 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     final UserCubit userCubit = context.read<UserCubit>();
     context.read<AccountsCubit>().update(userCubit.state.user!.userId);
+    context.read<CurrenciesCubit>().update();
   }
 
   @override
   Widget build(BuildContext context) {
     final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
     final UserCubit userCubit = context.watch<UserCubit>();
+    final CurrenciesCubit currenciesCubit = context.watch<CurrenciesCubit>();
 
     final NavigatorState nav = Navigator.of(context);
 
@@ -65,9 +69,28 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: IconButton(
+                  child: PopupMenuButton<Currency>(
                     icon: const Icon(Icons.add),
-                    onPressed: () => {},
+                    onSelected: (currency) {},
+                    itemBuilder: (_) {
+                      return currenciesCubit.state
+                          .map(
+                            (currency) => PopupMenuItem<Currency>(
+                              value: currency,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage:
+                                    NetworkImage(currency.flagImageUrl),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(child: Text("${currency.name} (${currency.symbol})")),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList();
+                    },
                   ),
                 ),
               ],
@@ -108,7 +131,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class CurrencyTile extends StatefulWidget {
+class CurrencyTile extends StatelessWidget {
   const CurrencyTile({
     super.key,
     required this.account,
@@ -119,46 +142,39 @@ class CurrencyTile extends StatefulWidget {
   final GetUserResponse user;
 
   @override
-  State<CurrencyTile> createState() => _CurrencyTileState();
-}
-
-class _CurrencyTileState extends State<CurrencyTile> {
-  bool selected = false;
-
-  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final NavigatorState nav = Navigator.of(context);
+    final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
+    final HomePageCubit homePageCubit = context.watch<HomePageCubit>();
 
     return Column(
       children: [
         GestureDetector(
           behavior: HitTestBehavior.translucent,
-          onTap: () => setState(() => selected = !selected),
+          onTap: () => homePageCubit.setSelectedAccount(account),
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage:
-                    NetworkImage(widget.account.currency.flagImageUrl),
+                backgroundImage: NetworkImage(account.currency.flagImageUrl),
               ),
               const SizedBox(width: 15),
-              Text(widget.account.currency.currencyCode,
-                  style: Fonts.neueBold(20)),
+              Text(account.currency.currencyCode, style: Fonts.neueBold(20)),
               const Expanded(child: SizedBox()),
               Column(
                 children: [
                   Text(
-                      "${widget.account.currency.symbol}${widget.account.balance.toStringAsFixed(2)} ${widget.account.currency.currencyCode}",
+                      "${account.currency.symbol}${account.balance.toStringAsFixed(2)} ${account.currency.currencyCode}",
                       style: Fonts.neueMedium(15)),
                   Text(
-                      "${widget.user.localCurrency.symbol}${widget.account.localValue.toStringAsFixed(2)} ${widget.user.localCurrency.currencyCode}",
+                      "${user.localCurrency.symbol}${account.localValue.toStringAsFixed(2)} ${user.localCurrency.currencyCode}",
                       style: Fonts.neueLight(15)),
                 ],
               ),
             ],
           ),
         ),
-        if (selected) ...[
+        if (homePageCubit.state.selectedAccount == account) ...[
           const SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -172,8 +188,12 @@ class _CurrencyTileState extends State<CurrencyTile> {
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
                           create: (_) => ExchangeCubit(
-                            widget.account.currency,
-                            widget.user.localCurrency,
+                            account.currency,
+                            accountsCubit.state
+                                .singleWhere((a) =>
+                                    a.currency.currencyId ==
+                                    "6c84631c-838b-403e-8e2b-38614d2e907d")
+                                .currency,
                           ),
                           child: const ExchangePage(),
                         ),
@@ -194,7 +214,7 @@ class _CurrencyTileState extends State<CurrencyTile> {
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
                           create: (_) => DepositCubit(),
-                          child: DepositPage(account: widget.account),
+                          child: DepositPage(account: account),
                         ),
                       ),
                     ),
@@ -213,7 +233,7 @@ class _CurrencyTileState extends State<CurrencyTile> {
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
                           create: (_) => WithdrawCubit(),
-                          child: WithdrawPage(account: widget.account),
+                          child: WithdrawPage(account: account),
                         ),
                       ),
                     ),

@@ -20,8 +20,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
 
-    context.read<CurrenciesCubit>().update();
-
     selectedCurrency =
         context.read<UserCubit>().state.user!.localCurrency.currencyId;
   }
