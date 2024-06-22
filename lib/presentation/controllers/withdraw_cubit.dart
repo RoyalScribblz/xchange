@@ -7,37 +7,19 @@ class WithdrawCubit extends Cubit<WithdrawRequest> {
 
   void setAmount(double amount) {
     emit(
-      DepositRequest(
-        amount,
-        state.cardholderName,
-        state.cardNumber,
-        state.expiryDate,
-        state.cvvCvc,
-      ),
+      WithdrawRequest(amount, state.iban, state.swiftBic)
     );
   }
 
-  void setCardholderName(String cardholderName) {
+  void setIban(String iban) {
     emit(
-      DepositRequest(
-        state.amount,
-        cardholderName,
-        state.cardNumber,
-        state.expiryDate,
-        state.cvvCvc,
-      ),
+        WithdrawRequest(state.amount, iban, state.swiftBic)
     );
   }
 
-  void setCardNumber(String cardNumber) {
+  void setSwiftBic(String swiftBic) {
     emit(
-      DepositRequest(
-        state.amount,
-        state.cardholderName,
-        cardNumber,
-        state.expiryDate,
-        state.cvvCvc,
-      ),
+        WithdrawRequest(state.amount, state.iban, swiftBic)
     );
   }
 }

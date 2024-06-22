@@ -9,7 +9,9 @@ import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/deposit_cubit.dart";
+import "../../controllers/exchange_cubit.dart";
 import "../../controllers/user_cubit.dart";
+import "../../controllers/withdraw_cubit.dart";
 import "../common/spaced_column.dart";
 import "../deposit_page/deposit_page.dart";
 import "../exchange_page/exchange_page.dart";
@@ -136,10 +138,12 @@ class _CurrencyTileState extends State<CurrencyTile> {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(widget.account.currency.flagImageUrl),
+                backgroundImage:
+                    NetworkImage(widget.account.currency.flagImageUrl),
               ),
               const SizedBox(width: 15),
-              Text(widget.account.currency.currencyCode, style: Fonts.neueBold(20)),
+              Text(widget.account.currency.currencyCode,
+                  style: Fonts.neueBold(20)),
               const Expanded(child: SizedBox()),
               Column(
                 children: [
@@ -164,8 +168,17 @@ class _CurrencyTileState extends State<CurrencyTile> {
                   IconButton.filled(
                     style: IconButton.styleFrom(
                         backgroundColor: theme.textTheme.bodyMedium?.color),
-                    onPressed: () async => await nav.push(MaterialPageRoute(
-                        builder: (_) => const ExchangePage())),
+                    onPressed: () async => await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => ExchangeCubit(
+                            widget.account.currency,
+                            widget.user.localCurrency,
+                          ),
+                          child: const ExchangePage(),
+                        ),
+                      ),
+                    ),
                     icon: const Icon(Icons.swap_horiz),
                   ),
                   const Text("Exchange"),
@@ -196,8 +209,14 @@ class _CurrencyTileState extends State<CurrencyTile> {
                   IconButton.filled(
                     style: IconButton.styleFrom(
                         backgroundColor: theme.textTheme.bodyMedium?.color),
-                    onPressed: () async => await nav.push(MaterialPageRoute(
-                        builder: (_) => WithdrawPage(account: widget.account))),
+                    onPressed: () async => await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => WithdrawCubit(),
+                          child: WithdrawPage(account: widget.account),
+                        ),
+                      ),
+                    ),
                     icon: const Icon(Icons.upload),
                   ),
                   const Text("Withdraw"),

@@ -1,6 +1,9 @@
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../../fonts.dart";
+import "../../controllers/accounts_cubit.dart";
+import "../../controllers/exchange_cubit.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
 
 class ExchangePage extends StatelessWidget {
@@ -10,6 +13,10 @@ class ExchangePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final NavigatorState nav = Navigator.of(context);
+    final ExchangeCubit exchangeCubit = context.watch<ExchangeCubit>();
+    final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
+    final double balance =
+        accountsCubit.getBalance(exchangeCubit.state.fromCurrency.currencyId);
 
     return Scaffold(
       body: SafeArea(
@@ -29,12 +36,14 @@ class ExchangePage extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Column(
                     children: [
-                      Text("Convert GBP", style: Fonts.neueBold(15)),
+                      Text(
+                          "Convert ${exchangeCubit.state.fromCurrency.currencyCode}",
+                          style: Fonts.neueBold(15)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "£378.53 available",
+                            "${exchangeCubit.state.fromCurrency.symbol}${balance.toStringAsFixed(2)} available",
                             style: Fonts.neueMedium(15),
                           ),
                           const SizedBox(width: 5),
@@ -48,9 +57,12 @@ class ExchangePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 60),
-            Text("GBP 75.00", style: Fonts.neueMedium(50)),
+            Text(
+                "${exchangeCubit.state.fromCurrency.currencyCode} ${exchangeCubit.state.amount}",
+                style: Fonts.neueMedium(50)),
             ElevatedButton(
-              onPressed: () => {},
+              onPressed: () =>
+                  exchangeCubit.setAmount((balance * 100).round() / 100),
               child: Text("MAX", style: Fonts.neueBold(15)),
             ),
             const Expanded(child: SizedBox()),
@@ -69,21 +81,25 @@ class ExchangePage extends StatelessWidget {
                   child: Row(
                     children: [
                       const Expanded(child: SizedBox()),
-                      const CircleAvatar(
+                      CircleAvatar(
                         backgroundImage: NetworkImage(
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/383px-Flag_of_the_United_Kingdom_%281-2%29.svg.png"),
+                          exchangeCubit.state.fromCurrency.flagImageUrl,
+                        ),
                       ),
                       const SizedBox(width: 15),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("From", style: Fonts.neueLight(15)),
-                          Text("GBP (£)", style: Fonts.neueMedium(15)),
+                          Text(
+                            "${exchangeCubit.state.fromCurrency.currencyCode} (${exchangeCubit.state.fromCurrency.symbol})",
+                            style: Fonts.neueMedium(15),
+                          ),
                         ],
                       ),
                       const SizedBox(width: 30),
                       ElevatedButton(
-                        onPressed: () => {},
+                        onPressed: () => exchangeCubit.swapToAndFromCurrency(),
                         child: const Icon(Icons.swap_horiz),
                       ),
                       const SizedBox(width: 30),
@@ -91,13 +107,17 @@ class ExchangePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("To", style: Fonts.neueLight(15)),
-                          Text(r"USD ($)", style: Fonts.neueMedium(15)),
+                          Text(
+                            "${exchangeCubit.state.toCurrency.currencyCode} (${exchangeCubit.state.toCurrency.symbol})",
+                            style: Fonts.neueMedium(15),
+                          ),
                         ],
                       ),
                       const SizedBox(width: 15),
-                      const CircleAvatar(
+                      CircleAvatar(
                         backgroundImage: NetworkImage(
-                            "https://cdn.britannica.com/33/4833-004-828A9A84/Flag-United-States-of-America.jpg"),
+                          exchangeCubit.state.toCurrency.flagImageUrl,
+                        ),
                       ),
                       const Expanded(child: SizedBox()),
                     ],
@@ -127,7 +147,8 @@ class ExchangePage extends StatelessWidget {
             ContinueButton(
               label: "Preview Exchange",
               onPressed: () async => {
-                await nav.push(MaterialPageRoute(builder: (_) => const ExchangePreviewPage()))
+                await nav.push(MaterialPageRoute(
+                    builder: (_) => const ExchangePreviewPage()))
               },
             ),
           ],
@@ -149,7 +170,6 @@ class ContinueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Row(
       children: [
         Expanded(
@@ -179,13 +199,24 @@ class KeyboardButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ExchangeCubit exchangeCubit = context.watch<ExchangeCubit>();
+
     final Widget button = widget is IconData
         ? IconButton(
-            onPressed: () => {},
-            icon: Icon(widget as IconData),
+            onPressed: () => exchangeCubit.amountBackspace(),
+            icon: Icon(
+              size: 30,
+              widget as IconData,
+              color: Theme.of(context).primaryColor,
+            ),
           )
         : TextButton(
-            onPressed: () => {},
+            onPressed: () {
+              if (widget is String) {
+                final String key = widget as String;
+                exchangeCubit.amountKey(key);
+              }
+            },
             child: Text(
               widget is String ? widget as String : "",
               style: Fonts.neueMedium(30),

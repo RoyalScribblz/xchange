@@ -138,7 +138,7 @@ class DepositPage extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (_) => SuccessPage(
                                 mainText: "Deposit Successful",
-                                subText: "£${account.currency.symbol}${depositCubit.state.amount.toStringAsFixed(2)} ${account.currency.currencyCode}",
+                                subText: "${account.currency.symbol}${depositCubit.state.amount.toStringAsFixed(2)} ${account.currency.currencyCode}",
                               ),
                             ),
                           );
