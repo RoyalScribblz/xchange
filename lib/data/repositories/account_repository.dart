@@ -63,4 +63,24 @@ class AccountRepository {
 
     return null;
   }
+
+  static Future<GetAccountsResponse?> create(String userId, String currencyId) async {
+    final response = await http.post(
+      Uri.http("10.0.2.2:5230", "create", {
+        "userId": userId,
+        "currencyId": currencyId,
+      }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Accept": "*/*"
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return GetAccountsResponse.fromJson(json.decode(response.body));
+    }
+
+    return null;
+  }
 }

@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                   alignment: Alignment.centerRight,
                   child: PopupMenuButton<Currency>(
                     icon: const Icon(Icons.add),
-                    onSelected: (currency) {},
+                    onSelected: (currency) => accountsCubit.createAccount(userCubit.state.user!.userId, currency.currencyId),
                     itemBuilder: (_) {
                       return currenciesCubit.state
                           .map(

@@ -53,4 +53,14 @@ class AccountsCubit extends Cubit<List<GetAccountsResponse>> {
 
     return account.balance;
   }
+
+  Future createAccount(String userId, String currencyId) async {
+    final GetAccountsResponse? account =
+        await AccountRepository.create(userId, currencyId);
+
+    if (account == null) {
+      return;
+    }
+    emit([...state, account]);
+  }
 }
