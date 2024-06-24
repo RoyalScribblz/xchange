@@ -55,7 +55,7 @@ class WithdrawPage extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: CircleAvatar(
                           backgroundImage:
-                              NetworkImage(account.currency.flagImageUrl),
+                          AssetImage(account.currency.flagImageUrl),
                         ),
                       ),
                       Align(

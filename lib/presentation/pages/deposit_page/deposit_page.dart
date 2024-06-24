@@ -62,7 +62,7 @@ class DepositPage extends StatelessWidget {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: CircleAvatar(
-                                  backgroundImage: NetworkImage(
+                                  backgroundImage: AssetImage(
                                       account.currency.flagImageUrl),
                                 ),
                               ),

@@ -77,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 CircleAvatar(
                                   backgroundImage:
-                                      NetworkImage(currency.flagImageUrl),
+                                      AssetImage(currency.flagImageUrl),
                                 ),
                                 const SizedBox(width: 5),
                                 Text("${currency.name} (${currency.symbol})"),

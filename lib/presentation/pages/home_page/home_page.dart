@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   CircleAvatar(
                                     backgroundImage:
-                                    NetworkImage(currency.flagImageUrl),
+                                    AssetImage(currency.flagImageUrl),
                                   ),
                                   const SizedBox(width: 5),
                                   Expanded(child: Text("${currency.name} (${currency.symbol})")),
@@ -156,7 +156,7 @@ class CurrencyTile extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(account.currency.flagImageUrl),
+                backgroundImage: AssetImage(account.currency.flagImageUrl),
               ),
               const SizedBox(width: 15),
               Text(account.currency.currencyCode, style: Fonts.neueBold(20)),

@@ -82,7 +82,7 @@ class ExchangePage extends StatelessWidget {
                     children: [
                       const Expanded(child: SizedBox()),
                       CircleAvatar(
-                        backgroundImage: NetworkImage(
+                        backgroundImage: AssetImage(
                           exchangeCubit.state.fromCurrency.flagImageUrl,
                         ),
                       ),
@@ -115,7 +115,7 @@ class ExchangePage extends StatelessWidget {
                       ),
                       const SizedBox(width: 15),
                       CircleAvatar(
-                        backgroundImage: NetworkImage(
+                        backgroundImage: AssetImage(
                           exchangeCubit.state.toCurrency.flagImageUrl,
                         ),
                       ),
