@@ -1,8 +1,10 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
+import "../../../data/dtos/currency.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
+import "../../controllers/currencies_cubit.dart";
 import "../../controllers/exchange_cubit.dart";
 import "../../controllers/user_cubit.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
@@ -17,6 +19,7 @@ class ExchangePage extends StatelessWidget {
     final ExchangeCubit exchangeCubit = context.watch<ExchangeCubit>();
     final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
     final UserCubit userCubit = context.watch<UserCubit>();
+    final CurrenciesCubit currenciesCubit = context.watch<CurrenciesCubit>();
     final double balance =
         accountsCubit.getBalance(exchangeCubit.state.fromCurrency.currencyId);
 
@@ -83,21 +86,50 @@ class ExchangePage extends StatelessWidget {
                   child: Row(
                     children: [
                       const Expanded(child: SizedBox()),
-                      CircleAvatar(
-                        backgroundImage: AssetImage(
-                          exchangeCubit.state.fromCurrency.flagImageUrl,
+                      PopupMenuButton<Currency>(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              backgroundImage: AssetImage(
+                                exchangeCubit.state.fromCurrency.flagImageUrl,
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("From", style: Fonts.neueLight(15)),
+                                Text(
+                                  "${exchangeCubit.state.fromCurrency.currencyCode} (${exchangeCubit.state.fromCurrency.symbol})",
+                                  style: Fonts.neueMedium(15),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("From", style: Fonts.neueLight(15)),
-                          Text(
-                            "${exchangeCubit.state.fromCurrency.currencyCode} (${exchangeCubit.state.fromCurrency.symbol})",
-                            style: Fonts.neueMedium(15),
-                          ),
-                        ],
+                        onSelected: (currency) => exchangeCubit.setFromCurrency(currency),
+                        itemBuilder: (_) {
+                          return currenciesCubit.state
+                              .map(
+                                (currency) => PopupMenuItem<Currency>(
+                                  value: currency,
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage:
+                                            AssetImage(currency.flagImageUrl),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Expanded(
+                                          child: Text(
+                                              "${currency.name} (${currency.symbol})")),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              .toList();
+                        },
                       ),
                       const SizedBox(width: 30),
                       ElevatedButton(
@@ -105,21 +137,50 @@ class ExchangePage extends StatelessWidget {
                         child: const Icon(Icons.swap_horiz),
                       ),
                       const SizedBox(width: 30),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("To", style: Fonts.neueLight(15)),
-                          Text(
-                            "${exchangeCubit.state.toCurrency.currencyCode} (${exchangeCubit.state.toCurrency.symbol})",
-                            style: Fonts.neueMedium(15),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 15),
-                      CircleAvatar(
-                        backgroundImage: AssetImage(
-                          exchangeCubit.state.toCurrency.flagImageUrl,
+                      PopupMenuButton<Currency>(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("To", style: Fonts.neueLight(15)),
+                                Text(
+                                  "${exchangeCubit.state.toCurrency.currencyCode} (${exchangeCubit.state.toCurrency.symbol})",
+                                  style: Fonts.neueMedium(15),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 15),
+                            CircleAvatar(
+                              backgroundImage: AssetImage(
+                                exchangeCubit.state.toCurrency.flagImageUrl,
+                              ),
+                            ),
+                          ],
                         ),
+                        onSelected: (currency) => exchangeCubit.setToCurrency(currency),
+                        itemBuilder: (_) {
+                          return currenciesCubit.state
+                              .map(
+                                (currency) => PopupMenuItem<Currency>(
+                              value: currency,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage:
+                                    AssetImage(currency.flagImageUrl),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                      child: Text(
+                                          "${currency.name} (${currency.symbol})")),
+                                ],
+                              ),
+                            ),
+                          )
+                              .toList();
+                        },
                       ),
                       const Expanded(child: SizedBox()),
                     ],
@@ -158,8 +219,9 @@ class ExchangePage extends StatelessWidget {
 
                 await nav.push(
                   MaterialPageRoute(
-                    builder: (_) => BlocProvider(create: (_) => exchangeCubit,
-                    child: const ExchangePreviewPage()),
+                    builder: (_) => BlocProvider(
+                        create: (_) => exchangeCubit,
+                        child: const ExchangePreviewPage()),
                   ),
                 );
               },
