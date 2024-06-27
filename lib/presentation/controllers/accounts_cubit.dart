@@ -11,6 +11,10 @@ class AccountsCubit extends Cubit<List<GetAccountsResponse>> {
     emit(await AccountRepository.getAccounts(userId));
   }
 
+  void set(List<GetAccountsResponse> accounts) {
+    emit([...accounts]);
+  }
+
   Future<bool> deposit(String accountId, double amount) async {
     final GetAccountsResponse? response =
         await AccountRepository.deposit(accountId, amount);

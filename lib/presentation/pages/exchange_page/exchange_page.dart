@@ -4,6 +4,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/exchange_cubit.dart";
+import "../../controllers/user_cubit.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
 
 class ExchangePage extends StatelessWidget {
@@ -15,6 +16,7 @@ class ExchangePage extends StatelessWidget {
     final NavigatorState nav = Navigator.of(context);
     final ExchangeCubit exchangeCubit = context.watch<ExchangeCubit>();
     final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
+    final UserCubit userCubit = context.watch<UserCubit>();
     final double balance =
         accountsCubit.getBalance(exchangeCubit.state.fromCurrency.currencyId);
 
@@ -146,9 +148,20 @@ class ExchangePage extends StatelessWidget {
             ),
             ContinueButton(
               label: "Preview Exchange",
-              onPressed: () async => {
-                await nav.push(MaterialPageRoute(
-                    builder: (_) => const ExchangePreviewPage()))
+              onPressed: () async {
+                final bool success = await exchangeCubit
+                    .createExchange(userCubit.state.user!.userId);
+
+                if (success == false) {
+                  return;
+                }
+
+                await nav.push(
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider(create: (_) => exchangeCubit,
+                    child: const ExchangePreviewPage()),
+                  ),
+                );
               },
             ),
           ],

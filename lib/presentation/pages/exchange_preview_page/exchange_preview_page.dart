@@ -1,6 +1,14 @@
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 
+import "../../../data/contracts/get_accounts_response.dart";
+import "../../../data/contracts/pending_exchange.dart";
+import "../../../data/dtos/currency.dart";
 import "../../../fonts.dart";
+import "../../controllers/accounts_cubit.dart";
+import "../../controllers/currencies_cubit.dart";
+import "../../controllers/exchange_cubit.dart";
+import "../../controllers/user_cubit.dart";
 import "../exchange_page/exchange_page.dart";
 import "../exchange_success_page/exchange_success_page.dart";
 
@@ -10,6 +18,16 @@ class ExchangePreviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final NavigatorState nav = Navigator.of(context);
+    final UserCubit userCubit = context.watch<UserCubit>();
+    final ExchangeCubit exchangeCubit = context.watch<ExchangeCubit>();
+    final CurrenciesCubit currenciesCubit = context.watch<CurrenciesCubit>();
+    final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
+    final Currency toCurrency = currenciesCubit.state.singleWhere((c) =>
+        c.currencyId == exchangeCubit.state.pendingExchange!.toCurrencyId);
+    final Currency fromCurrency = currenciesCubit.state.singleWhere((c) =>
+        c.currencyId == exchangeCubit.state.pendingExchange!.fromCurrencyId);
+    final PendingExchange pendingExchange =
+        exchangeCubit.state.pendingExchange!;
 
     return Scaffold(
       body: SafeArea(
@@ -33,7 +51,7 @@ class ExchangePreviewPage extends StatelessWidget {
             ),
             const SizedBox(height: 50),
             Text(
-              "USD 95.28",
+              "${toCurrency.currencyCode} ${pendingExchange.toAmount}",
               style: Fonts.neueMedium(30),
             ),
             const SizedBox(height: 50),
@@ -56,7 +74,7 @@ class ExchangePreviewPage extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          "GBP",
+                          fromCurrency.currencyCode,
                           style: Fonts.neueLight(15),
                         ),
                       ),
@@ -76,7 +94,7 @@ class ExchangePreviewPage extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          "1 GBP = 1.27 USD",
+                          "1 ${fromCurrency.currencyCode} = ${(pendingExchange.toAmount / pendingExchange.fromAmount).toStringAsFixed(2)} ${toCurrency.currencyCode}",
                           style: Fonts.neueLight(15),
                         ),
                       ),
@@ -96,7 +114,7 @@ class ExchangePreviewPage extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          "GBP (£) 75.00",
+                          "${fromCurrency.currencyCode} (${fromCurrency.symbol}) ${pendingExchange.fromAmount.toStringAsFixed(2)}",
                           style: Fonts.neueLight(15),
                         ),
                       ),
@@ -108,15 +126,23 @@ class ExchangePreviewPage extends StatelessWidget {
             const Expanded(child: SizedBox()),
             ContinueButton(
               label: "Exchange Now",
-              onPressed: () async => {
+              onPressed: () async {
+                final List<GetAccountsResponse> accounts = await exchangeCubit.completeExchange(userCubit.state.user!.userId);
+
+                if (accounts.isEmpty) {
+                  return;
+                }
+
+                accountsCubit.set(accounts);
+
                 await nav.push(
                   MaterialPageRoute(
-                    builder: (_) => const SuccessPage(
-                      mainText: "Converted £75.00 GBP to",
-                      subText: r"$95.28 USD",
+                    builder: (_) => SuccessPage(
+                      mainText: "Converted ${fromCurrency.symbol}${pendingExchange.fromAmount.toStringAsFixed(2)} ${fromCurrency.currencyCode} to",
+                      subText: "${toCurrency.symbol}${pendingExchange.toAmount.toStringAsFixed(2)} ${toCurrency.currencyCode}",
                     ),
                   ),
-                ),
+                );
               },
             ),
           ],
