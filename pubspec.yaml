@@ -43,6 +43,9 @@ dependencies:
   flutter_bloc: ^8.1.5
   bloc_provider: ^1.0.0
   collection: ^1.18.0
+  image_picker: ^1.1.2
+  file_picker: ^8.0.5
+  pdfrx: ^1.0.72
 
 dev_dependencies:
   flutter_test:

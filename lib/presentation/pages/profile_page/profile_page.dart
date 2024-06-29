@@ -80,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       AssetImage(currency.flagImageUrl),
                                 ),
                                 const SizedBox(width: 5),
-                                Text("${currency.name} (${currency.symbol})"),
+                                Text("${currency.name} (${currency.symbol})", style: Fonts.neueMedium(15)),
                               ],
                             ),
                           ),

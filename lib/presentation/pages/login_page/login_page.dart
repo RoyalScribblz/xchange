@@ -2,10 +2,13 @@ import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
+import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/cubit_models/user.dart";
+import "../../controllers/evidence_cubit.dart";
 import "../../controllers/home_page_cubit.dart";
 import "../../controllers/user_cubit.dart";
+import "../frozen_page/frozen_page.dart";
 import "../home_page/home_page.dart";
 
 class LoginPage extends StatefulWidget {
@@ -31,6 +34,11 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final UserCubit userCubit = context.watch<UserCubit>();
 
+    return BlocProvider(
+      create: (_) => EvidenceCubit(),
+      child: FrozenPage(),
+    );
+
     if (userCubit.state.credentials == null) {
       return Scaffold(
         body: SafeArea(
@@ -43,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   await userCubit.login(credentials);
                 },
-                child: const Text("Login"),
+                child: Text("Login", style: Fonts.neueMedium(20)),
               )
             ],
           ),

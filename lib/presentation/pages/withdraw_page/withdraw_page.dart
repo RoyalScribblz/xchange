@@ -55,7 +55,7 @@ class WithdrawPage extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: CircleAvatar(
                           backgroundImage:
-                          AssetImage(account.currency.flagImageUrl),
+                              AssetImage(account.currency.flagImageUrl),
                         ),
                       ),
                       Align(
@@ -90,13 +90,21 @@ class WithdrawPage extends StatelessWidget {
                         withdrawCubit.setAmount(amount),
                   ),
                   const SizedBox(height: 30),
-                  const Text("Payment Details:"),
+                  Text("Payment Details:", style: Fonts.neueMedium(15)),
                   const SizedBox(height: 15),
-                  const TextField(
-                      decoration: InputDecoration(label: Text("IBAN"))),
+                  TextField(
+                    decoration: InputDecoration(
+                      label: Text("IBAN", style: Fonts.neueMedium(20)),
+                    ),
+                    style: Fonts.neueLight(20),
+                  ),
                   const SizedBox(height: 15),
-                  const TextField(
-                      decoration: InputDecoration(label: Text("SWIFTBIC"))),
+                  TextField(
+                    decoration: InputDecoration(
+                      label: Text("SWIFTBIC", style: Fonts.neueMedium(20)),
+                    ),
+                    style: Fonts.neueLight(20),
+                  ),
                 ],
               ),
             ),
@@ -125,11 +133,11 @@ class WithdrawPage extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: const Text("ERROR"),
+                        title: Text("ERROR", style: Fonts.neueMedium(15)),
                         actions: [
                           TextButton(
                             onPressed: () {},
-                            child: const Text("OK"),
+                            child: Text("OK", style: Fonts.neueMedium(15)),
                           ),
                         ],
                       );

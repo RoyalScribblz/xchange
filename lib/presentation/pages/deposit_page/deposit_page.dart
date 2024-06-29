@@ -89,38 +89,42 @@ class DepositPage extends StatelessWidget {
                                 depositCubit.setAmount(amount),
                           ),
                           const SizedBox(height: 30),
-                          const Text("Payment Details:"),
+                          Text("Payment Details:", style: Fonts.neueMedium(15)),
                           const SizedBox(height: 15),
                           TextField(
                             onChanged: (String cardholderName) =>
                                 depositCubit.setCardholderName(cardholderName),
-                            decoration: const InputDecoration(
-                              label: Text("Cardholder Name"),
+                            decoration: InputDecoration(
+                              label: Text("Cardholder Name", style: Fonts.neueMedium(20)),
                             ),
+                            style: Fonts.neueLight(20),
                           ),
                           const SizedBox(height: 15),
                           TextField(
                             onChanged: (String cardNumber) =>
                                 depositCubit.setCardNumber(cardNumber),
-                            decoration: const InputDecoration(
-                              label: Text("Card Number"),
+                            decoration: InputDecoration(
+                              label: Text("Card Number", style: Fonts.neueMedium(20)),
                             ),
+                            style: Fonts.neueLight(20),
                           ),
                           const SizedBox(height: 15),
                           TextField(
                             onChanged: (String expiryDate) =>
                                 depositCubit.setExpiryDate(expiryDate),
-                            decoration: const InputDecoration(
-                              label: Text("Expiry Date"),
+                            decoration: InputDecoration(
+                              label: Text("Expiry Date", style: Fonts.neueMedium(20)),
                             ),
+                            style: Fonts.neueLight(20),
                           ),
                           const SizedBox(height: 15),
                           TextField(
                             onChanged: (String cvvCvc) =>
                                 depositCubit.setCvvCvc(cvvCvc),
-                            decoration: const InputDecoration(
-                              label: Text("CVV/CVC"),
+                            decoration: InputDecoration(
+                              label: Text("CVV/CVC", style: Fonts.neueMedium(20)),
                             ),
+                            style: Fonts.neueLight(20),
                           ),
                         ],
                       ),
@@ -150,11 +154,11 @@ class DepositPage extends StatelessWidget {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: const Text("ERROR"),
+                                title: Text("ERROR", style: Fonts.neueMedium(15)),
                                 actions: [
                                   TextButton(
                                     onPressed: () {},
-                                    child: const Text("OK"),
+                                    child: Text("OK", style: Fonts.neueMedium(15)),
                                   ),
                                 ],
                               );
