@@ -34,10 +34,11 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final UserCubit userCubit = context.watch<UserCubit>();
 
-    return BlocProvider(
-      create: (_) => EvidenceCubit(),
-      child: FrozenPage(),
-    );
+    // return BlocProvider(
+    //   create: (_) => EvidenceCubit(),
+    //   child: FrozenPage(),
+    // );
+    // TODO remove
 
     if (userCubit.state.credentials == null) {
       return Scaffold(

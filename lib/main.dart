@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:xchange/presentation/controllers/currencies_cubit.dart";
+import "package:xchange/presentation/pages/admin_page/admin_page.dart";
 import "presentation/controllers/accounts_cubit.dart";
 import "presentation/controllers/user_cubit.dart";
 import "presentation/pages/login_page/login_page.dart";
@@ -32,7 +33,7 @@ class VotingApp extends StatelessWidget {
       child: MaterialApp(
         title: "Xchange",
         theme: theme,
-        home: const LoginPage(),
+        home: const AdminPage(),
       ),
     );
   }
