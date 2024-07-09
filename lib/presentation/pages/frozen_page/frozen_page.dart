@@ -9,13 +9,26 @@ import "package:pdfrx/pdfrx.dart";
 
 import "../../../fonts.dart";
 import "../../controllers/evidence_cubit.dart";
+import "../../controllers/user_cubit.dart";
 import "../common/spaced_column.dart";
 import "../exchange_page/exchange_page.dart";
 
 enum AttachmentOption { photoLibrary, takePhoto, chooseFiles }
 
-class FrozenPage extends StatelessWidget {
-  FrozenPage({super.key});
+class FrozenPage extends StatefulWidget {
+  const FrozenPage({super.key});
+
+  @override
+  State<FrozenPage> createState() => _FrozenPageState();
+}
+
+class _FrozenPageState extends State<FrozenPage> {
+  @override
+  void initState() {
+    super.initState();
+    final String userId = context.read<UserCubit>().state.user!.userId;
+    context.read<EvidenceCubit>().initialise(userId);
+  }
 
   final ImagePicker picker = ImagePicker();
 
@@ -123,12 +136,14 @@ class FrozenPage extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis)),
                         IconButton(
-                            onPressed: () => evidenceCubit.removeImage(image), icon: const Icon(Icons.close))
+                            onPressed: () => evidenceCubit.removeImage(image),
+                            icon: const Icon(Icons.close))
                       ],
                     ),
                 ],
               ),
-              if (evidenceCubit.state.pdfs.isNotEmpty) const SizedBox(height: 5),
+              if (evidenceCubit.state.pdfs.isNotEmpty)
+                const SizedBox(height: 5),
               SpacedColumn(
                 spaceHeight: 5,
                 children: [
@@ -150,13 +165,17 @@ class FrozenPage extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis)),
                         IconButton(
-                            onPressed: () => evidenceCubit.removePdf(i), icon: const Icon(Icons.close))
+                            onPressed: () => evidenceCubit.removePdf(i),
+                            icon: const Icon(Icons.close))
                       ],
                     ),
                 ],
               ),
               const Expanded(child: SizedBox()),
-              ContinueButton(label: "Submit Evidence", onPressed: () => {})
+              ContinueButton(
+                label: "Submit Evidence",
+                onPressed: () async => await evidenceCubit.submitEvidence(),
+              ),
             ],
           ),
         ),

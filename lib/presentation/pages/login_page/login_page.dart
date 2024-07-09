@@ -64,6 +64,8 @@ class _LoginPageState extends State<LoginPage> {
     // TODO account creation page
     // }
 
+    return BlocProvider(create: (_) => EvidenceCubit(), child: const FrozenPage());
+
     return BlocProvider(
       create: (_) => HomePageCubit(),
       child: const HomePage(),

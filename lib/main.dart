@@ -35,7 +35,7 @@ class VotingApp extends StatelessWidget {
       child: MaterialApp(
         title: "Xchange",
         theme: theme,
-        home: BlocProvider(create: (_) => EvidenceCubit(), child: FrozenPage()),
+        home: const LoginPage(),
       ),
     );
   }
