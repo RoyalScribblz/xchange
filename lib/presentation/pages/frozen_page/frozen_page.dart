@@ -155,6 +155,7 @@ class FrozenPage extends StatelessWidget {
                     ),
                 ],
               ),
+              const Expanded(child: SizedBox()),
               ContinueButton(label: "Submit Evidence", onPressed: () => {})
             ],
           ),
