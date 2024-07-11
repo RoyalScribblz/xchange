@@ -12,6 +12,7 @@ import "../../controllers/evidence_cubit.dart";
 import "../../controllers/user_cubit.dart";
 import "../common/spaced_column.dart";
 import "../exchange_page/exchange_page.dart";
+import "../exchange_success_page/exchange_success_page.dart";
 
 enum AttachmentOption { photoLibrary, takePhoto, chooseFiles }
 
@@ -35,6 +36,7 @@ class _FrozenPageState extends State<FrozenPage> {
   @override
   Widget build(BuildContext context) {
     final EvidenceCubit evidenceCubit = context.watch<EvidenceCubit>();
+    final NavigatorState nav = Navigator.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -174,10 +176,51 @@ class _FrozenPageState extends State<FrozenPage> {
               const Expanded(child: SizedBox()),
               ContinueButton(
                 label: "Submit Evidence",
-                onPressed: () async => await evidenceCubit.submitEvidence(),
+                onPressed: () async {
+                  await evidenceCubit.submitEvidence();
+                  await nav.push(
+                    MaterialPageRoute(
+                      builder: (_) => const FrozenSubmissionPendingPage(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class FrozenSubmissionPendingPage extends StatelessWidget {
+  const FrozenSubmissionPendingPage({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              children: [
+                const Expanded(child: SizedBox()),
+                const Icon(Icons.pending, size: 150),
+                Text(
+                  "Evidence Submission Successful",
+                  style: Fonts.neueMedium(20),
+                ),
+                Text(
+                  "Pending Review",
+                  style: Fonts.neueBold(30),
+                ),
+                const Expanded(child: SizedBox()),
+              ],
+            ),
+          ],
         ),
       ),
     );

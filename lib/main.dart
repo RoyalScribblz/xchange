@@ -35,7 +35,7 @@ class VotingApp extends StatelessWidget {
       child: MaterialApp(
         title: "Xchange",
         theme: theme,
-        home: const LoginPage(),
+        home: const AdminPage(),
       ),
     );
   }

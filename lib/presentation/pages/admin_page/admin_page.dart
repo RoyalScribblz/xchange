@@ -1,9 +1,14 @@
+import "dart:io";
+
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:image_picker/image_picker.dart";
+import "package:pdfrx/pdfrx.dart";
 
 import "../../../data/dtos/currency.dart";
 import "../../../fonts.dart";
 import "../../controllers/currencies_cubit.dart";
+import "../../controllers/evidence_requests_cubit.dart";
 import "../../controllers/limits_cubit.dart";
 import "../common/spaced_column.dart";
 
@@ -51,7 +56,10 @@ class _AdminPageState extends State<AdminPage> {
             create: (_) => LimitsCubit(),
             child: const LimitsPage(),
           ),
-          const RequestsPage(),
+          BlocProvider(
+            create: (_) => EvidenceRequestsCubit(),
+            child: const RequestsPage(),
+          ),
         ][currentPageIndex],
       ),
     );
@@ -152,49 +160,103 @@ class _LimitsPageState extends State<LimitsPage> {
   }
 }
 
-class RequestsPage extends StatelessWidget {
+class RequestsPage extends StatefulWidget {
   const RequestsPage({super.key});
 
   @override
+  State<RequestsPage> createState() => _RequestsPageState();
+}
+
+class _RequestsPageState extends State<RequestsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<EvidenceRequestsCubit>().initialise();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final EvidenceRequestsCubit evidenceRequestsCubit =
+        context.watch<EvidenceRequestsCubit>();
+
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
         children: [
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "User ID: 7846578346543",
-                          style: Fonts.neueMedium(15),
+          for (int i = 0;
+              i < evidenceRequestsCubit.state.evidenceRequests.length;
+              i++)
+            Card(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "User ID: ${evidenceRequestsCubit.state.evidenceRequests[i].userId.substring(6)}",
+                            style: Fonts.neueMedium(15),
+                          ),
+                          Text(
+                            "Amount: ${evidenceRequestsCubit.state.evidenceRequests[i].currency.symbol}${evidenceRequestsCubit.state.evidenceRequests[i].amount} ${evidenceRequestsCubit.state.evidenceRequests[i].currency.currencyCode}",
+                            style: Fonts.neueMedium(15),
+                          ),
+                          Text("Evidence:", style: Fonts.neueMedium(15)),
+                        ],
+                      ),
+                      const Expanded(child: SizedBox()),
+                      IconButton(
+                        onPressed: () => {},
+                        icon: const Icon(Icons.check),
+                      ),
+                      IconButton(
+                        onPressed: () => {},
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  SpacedColumn(
+                    spaceHeight: 5,
+                    children: [
+                      for (XFile xFile in evidenceRequestsCubit.state.files[
+                          evidenceRequestsCubit
+                              .state.evidenceRequests[i].evidenceRequestId]!)
+                        Row(
+                          children: [
+                            xFile.mimeType == "application/pdf"
+                                ? SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: PdfPageView(
+                                      document: evidenceRequestsCubit
+                                          .state.pdfDocuments[xFile.path],
+                                      pageNumber: 1,
+                                    ),
+                                  )
+                                : Image.file(
+                                    File(xFile.path),
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  ),
+                            const SizedBox(width: 5),
+                            Expanded(
+                                child: Text(xFile.name,
+                                    style: Fonts.neueLight(15),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis)),
+                            IconButton(
+                                onPressed: () => {},
+                                icon:
+                                    const Icon(Icons.open_in_browser_outlined))
+                          ],
                         ),
-                        Text(
-                          "Amount: 23523526.23 £GBP",
-                          style: Fonts.neueMedium(15),
-                        ),
-                        Text("Evidence:", style: Fonts.neueMedium(15)),
-                      ],
-                    ),
-                    const Expanded(child: SizedBox()),
-                    IconButton(
-                      onPressed: () => {},
-                      icon: const Icon(Icons.check),
-                    ),
-                    IconButton(
-                      onPressed: () => {},
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
+                    ],
+                  ),
+                ],
+              ),
+            )
         ],
       ),
     );
