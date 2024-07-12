@@ -97,4 +97,30 @@ class EvidenceRequestRepository {
 
     return null;
   }
+
+  static Future<bool> acceptEvidenceRequest(String evidenceRequestId) async {
+    final response = await http.post(
+      Uri.http("10.0.2.2:5230", "evidenceRequest/$evidenceRequestId/accept"),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Accept": "*/*"
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
+  static Future<bool> rejectEvidenceRequest(String evidenceRequestId) async {
+    final response = await http.post(
+      Uri.http("10.0.2.2:5230", "evidenceRequest/$evidenceRequestId/reject"),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Accept": "*/*"
+      },
+    );
+
+    return response.statusCode == 200;
+  }
 }

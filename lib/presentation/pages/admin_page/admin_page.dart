@@ -6,11 +6,13 @@ import "package:image_picker/image_picker.dart";
 import "package:pdfrx/pdfrx.dart";
 
 import "../../../data/dtos/currency.dart";
+import "../../../data/dtos/evidence_request.dart";
 import "../../../fonts.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/evidence_requests_cubit.dart";
 import "../../controllers/limits_cubit.dart";
 import "../common/spaced_column.dart";
+import "../common/square_image.dart";
 
 class AdminPage extends StatefulWidget {
   const AdminPage({
@@ -26,11 +28,13 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   Widget build(BuildContext context) {
+    final LimitsCubit limitsCubit = context.watch<LimitsCubit>();
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       floatingActionButton: currentPageIndex == 0
           ? FloatingActionButton(
-              onPressed: () => {},
+              onPressed: () async => await limitsCubit.setCurrencyLimits(),
               child: const Icon(Icons.check),
             )
           : null,
@@ -52,10 +56,7 @@ class _AdminPageState extends State<AdminPage> {
       ),
       body: SafeArea(
         child: [
-          BlocProvider(
-            create: (_) => LimitsCubit(),
-            child: const LimitsPage(),
-          ),
+          const LimitsPage(),
           BlocProvider(
             create: (_) => EvidenceRequestsCubit(),
             child: const RequestsPage(),
@@ -113,21 +114,7 @@ class _LimitsPageState extends State<LimitsPage> {
                   for (Currency currency in filtered.keys)
                     Row(
                       children: [
-                        Container(
-                          decoration: const BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Colors.black,
-                              blurRadius: 3,
-                              offset: Offset(1, 2),
-                            )
-                          ]),
-                          child: Image.asset(
-                            currency.flagImageUrl,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                        SquareImage(assetPath: currency.flagImageUrl, size: 50),
                         const SizedBox(width: 7),
                         Expanded(
                           child: Text(
@@ -144,7 +131,7 @@ class _LimitsPageState extends State<LimitsPage> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () => {},
+                          onPressed: () => limitsCubit.setCurrencyLimit(currency),
                           icon: const Icon(Icons.check),
                         ),
                       ],
@@ -178,86 +165,175 @@ class _RequestsPageState extends State<RequestsPage> {
   Widget build(BuildContext context) {
     final EvidenceRequestsCubit evidenceRequestsCubit =
         context.watch<EvidenceRequestsCubit>();
+    final NavigatorState nav = Navigator.of(context);
+
+    final List<EvidenceRequest> requests = evidenceRequestsCubit
+        .state.evidenceRequests
+        .where((r) => r.status == EvidenceRequestStatus.active)
+        .toList();
 
     return Padding(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(10),
       child: Column(
         children: [
-          for (int i = 0;
-              i < evidenceRequestsCubit.state.evidenceRequests.length;
-              i++)
+          for (int i = 0; i < requests.length; i++)
             Card(
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "User ID: ${evidenceRequestsCubit.state.evidenceRequests[i].userId.substring(6)}",
-                            style: Fonts.neueMedium(15),
-                          ),
-                          Text(
-                            "Amount: ${evidenceRequestsCubit.state.evidenceRequests[i].currency.symbol}${evidenceRequestsCubit.state.evidenceRequests[i].amount} ${evidenceRequestsCubit.state.evidenceRequests[i].currency.currencyCode}",
-                            style: Fonts.neueMedium(15),
-                          ),
-                          Text("Evidence:", style: Fonts.neueMedium(15)),
-                        ],
-                      ),
-                      const Expanded(child: SizedBox()),
-                      IconButton(
-                        onPressed: () => {},
-                        icon: const Icon(Icons.check),
-                      ),
-                      IconButton(
-                        onPressed: () => {},
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                  SpacedColumn(
-                    spaceHeight: 5,
-                    children: [
-                      for (XFile xFile in evidenceRequestsCubit.state.files[
-                          evidenceRequestsCubit
-                              .state.evidenceRequests[i].evidenceRequestId]!)
-                        Row(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            xFile.mimeType == "application/pdf"
-                                ? SizedBox(
-                                    width: 50,
-                                    height: 50,
-                                    child: PdfPageView(
-                                      document: evidenceRequestsCubit
-                                          .state.pdfDocuments[xFile.path],
-                                      pageNumber: 1,
-                                    ),
-                                  )
-                                : Image.file(
-                                    File(xFile.path),
-                                    width: 50,
-                                    height: 50,
-                                    fit: BoxFit.cover,
-                                  ),
-                            const SizedBox(width: 5),
-                            Expanded(
-                                child: Text(xFile.name,
-                                    style: Fonts.neueLight(15),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis)),
-                            IconButton(
-                                onPressed: () => {},
-                                icon:
-                                    const Icon(Icons.open_in_browser_outlined))
+                            Text(
+                              "User ID: ${requests[i].userId.substring(6)}",
+                              style: Fonts.neueMedium(15),
+                            ),
+                            Text(
+                              "Amount: ${requests[i].currency.symbol}${requests[i].amount} ${requests[i].currency.currencyCode}",
+                              style: Fonts.neueMedium(15),
+                            ),
+                            Text("Evidence:", style: Fonts.neueMedium(15)),
                           ],
                         ),
-                    ],
-                  ),
-                ],
+                        const Expanded(child: SizedBox()),
+                        IconButton(
+                          onPressed: () async => evidenceRequestsCubit
+                              .acceptEvidenceRequest(evidenceRequestsCubit
+                                  .state.evidenceRequests[i].evidenceRequestId),
+                          icon: const Icon(Icons.check),
+                        ),
+                        IconButton(
+                          onPressed: () async => evidenceRequestsCubit
+                              .rejectEvidenceRequest(evidenceRequestsCubit
+                                  .state.evidenceRequests[i].evidenceRequestId),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    SpacedColumn(
+                      spaceHeight: 5,
+                      children: [
+                        for (XFile xFile in evidenceRequestsCubit.state.files[
+                            requests[i].evidenceRequestId]!)
+                          Row(
+                            children: [
+                              xFile.mimeType == "application/pdf"
+                                  ? SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: PdfPageView(
+                                        document: evidenceRequestsCubit
+                                            .state.pdfDocuments[xFile.path],
+                                        pageNumber: 1,
+                                      ),
+                                    )
+                                  : Image.file(
+                                      File(xFile.path),
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.cover,
+                                    ),
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Text(
+                                  xFile.name,
+                                  style: Fonts.neueLight(15),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () async => await nav.push(
+                                  MaterialPageRoute(
+                                    builder: (_) {
+                                      return xFile.mimeType == "application/pdf"
+                                          ? FullScreenPdfView(xFile.path)
+                                          : FullScreenImageView(xFile.path);
+                                    },
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.open_in_new_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             )
         ],
+      ),
+    );
+  }
+}
+
+class FullScreenImageView extends StatelessWidget {
+  const FullScreenImageView(this.imageFilePath, {super.key});
+
+  final String imageFilePath;
+
+  @override
+  Widget build(BuildContext context) {
+    final NavigatorState nav = Navigator.of(context);
+    return Scaffold(
+      backgroundColor: Colors.black,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => nav.pop(),
+        child: const Icon(Icons.close),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Image.file(
+                File(imageFilePath),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FullScreenPdfView extends StatelessWidget {
+  const FullScreenPdfView(this.pdfFilePath, {super.key});
+
+  final String pdfFilePath;
+
+  @override
+  Widget build(BuildContext context) {
+    final NavigatorState nav = Navigator.of(context);
+    return Scaffold(
+      backgroundColor: Colors.black,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => nav.pop(),
+        child: const Icon(Icons.close),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: PdfViewer.file(
+                pdfFilePath,
+                params: const PdfViewerParams(
+                  backgroundColor: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

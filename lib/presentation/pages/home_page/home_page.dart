@@ -15,6 +15,7 @@ import "../../controllers/home_page_cubit.dart";
 import "../../controllers/user_cubit.dart";
 import "../../controllers/withdraw_cubit.dart";
 import "../common/spaced_column.dart";
+import "../common/square_image.dart";
 import "../deposit_page/deposit_page.dart";
 import "../exchange_page/exchange_page.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
@@ -79,9 +80,9 @@ class _HomePageState extends State<HomePage> {
                               value: currency,
                               child: Row(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundImage:
-                                    AssetImage(currency.flagImageUrl),
+                                  SquareImage(
+                                    assetPath: currency.flagImageUrl,
+                                    size: 50,
                                   ),
                                   const SizedBox(width: 5),
                                   Expanded(child: Text("${currency.name} (${currency.symbol})", style: Fonts.neueMedium(15),)),
@@ -155,8 +156,9 @@ class CurrencyTile extends StatelessWidget {
           onTap: () => homePageCubit.setSelectedAccount(account),
           child: Row(
             children: [
-              CircleAvatar(
-                backgroundImage: AssetImage(account.currency.flagImageUrl),
+              SquareImage(
+                assetPath: account.currency.flagImageUrl,
+                size: 50,
               ),
               const SizedBox(width: 15),
               Text(account.currency.currencyCode, style: Fonts.neueBold(20)),

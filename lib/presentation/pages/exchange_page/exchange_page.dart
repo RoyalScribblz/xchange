@@ -7,6 +7,7 @@ import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/exchange_cubit.dart";
 import "../../controllers/user_cubit.dart";
+import "../common/square_image.dart";
 import "../exchange_preview_page/exchange_preview_page.dart";
 
 class ExchangePage extends StatelessWidget {
@@ -90,10 +91,10 @@ class ExchangePage extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            CircleAvatar(
-                              backgroundImage: AssetImage(
-                                exchangeCubit.state.fromCurrency.flagImageUrl,
-                              ),
+                            SquareImage(
+                              assetPath:
+                                  exchangeCubit.state.fromCurrency.flagImageUrl,
+                              size: 50,
                             ),
                             const SizedBox(width: 15),
                             Column(
@@ -108,7 +109,8 @@ class ExchangePage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        onSelected: (currency) => exchangeCubit.setFromCurrency(currency),
+                        onSelected: (currency) =>
+                            exchangeCubit.setFromCurrency(currency),
                         itemBuilder: (_) {
                           return currenciesCubit.state
                               .map(
@@ -116,9 +118,9 @@ class ExchangePage extends StatelessWidget {
                                   value: currency,
                                   child: Row(
                                     children: [
-                                      CircleAvatar(
-                                        backgroundImage:
-                                            AssetImage(currency.flagImageUrl),
+                                      SquareImage(
+                                        assetPath: currency.flagImageUrl,
+                                        size: 50,
                                       ),
                                       const SizedBox(width: 5),
                                       Expanded(
@@ -152,33 +154,34 @@ class ExchangePage extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(width: 15),
-                            CircleAvatar(
-                              backgroundImage: AssetImage(
-                                exchangeCubit.state.toCurrency.flagImageUrl,
-                              ),
+                            SquareImage(
+                              assetPath:
+                                  exchangeCubit.state.toCurrency.flagImageUrl,
+                              size: 50,
                             ),
                           ],
                         ),
-                        onSelected: (currency) => exchangeCubit.setToCurrency(currency),
+                        onSelected: (currency) =>
+                            exchangeCubit.setToCurrency(currency),
                         itemBuilder: (_) {
                           return currenciesCubit.state
                               .map(
                                 (currency) => PopupMenuItem<Currency>(
-                              value: currency,
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage:
-                                    AssetImage(currency.flagImageUrl),
+                                  value: currency,
+                                  child: Row(
+                                    children: [
+                                      SquareImage(
+                                        assetPath: currency.flagImageUrl,
+                                        size: 50,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Expanded(
+                                          child: Text(
+                                              "${currency.name} (${currency.symbol})")),
+                                    ],
                                   ),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                      child: Text(
-                                          "${currency.name} (${currency.symbol})")),
-                                ],
-                              ),
-                            ),
-                          )
+                                ),
+                              )
                               .toList();
                         },
                       ),

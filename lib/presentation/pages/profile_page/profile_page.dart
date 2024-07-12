@@ -1,12 +1,11 @@
-import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
-import "../../../data/dtos/currency.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/user_cubit.dart";
+import "../common/square_image.dart";
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -75,12 +74,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             value: currency.currencyId,
                             child: Row(
                               children: [
-                                CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage(currency.flagImageUrl),
+                                SquareImage(
+                                  assetPath: currency.flagImageUrl,
+                                  size: 50,
                                 ),
                                 const SizedBox(width: 5),
-                                Text("${currency.name} (${currency.symbol})", style: Fonts.neueMedium(15)),
+                                Text("${currency.name} (${currency.symbol})",
+                                    style: Fonts.neueMedium(15)),
                               ],
                             ),
                           ),
@@ -105,7 +105,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: FilledButton(
                       onPressed: () async {
                         await userCubit.updateLocalCurrency(selectedCurrency);
-                        await accountsCubit.update(userCubit.state.user!.userId);
+                        await accountsCubit
+                            .update(userCubit.state.user!.userId);
 
                         nav.pop();
                       },

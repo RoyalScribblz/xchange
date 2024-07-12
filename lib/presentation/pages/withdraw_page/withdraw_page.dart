@@ -5,6 +5,7 @@ import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/withdraw_cubit.dart";
+import "../common/square_image.dart";
 import "../exchange_page/exchange_page.dart";
 import "../exchange_success_page/exchange_success_page.dart";
 
@@ -53,9 +54,9 @@ class WithdrawPage extends StatelessWidget {
                     children: [
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: CircleAvatar(
-                          backgroundImage:
-                              AssetImage(account.currency.flagImageUrl),
+                        child: SquareImage(
+                          assetPath: account.currency.flagImageUrl,
+                          size: 50,
                         ),
                       ),
                       Align(

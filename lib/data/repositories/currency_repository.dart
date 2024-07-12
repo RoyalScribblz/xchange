@@ -23,4 +23,17 @@ class CurrencyRepository {
 
     return [];
   }
+
+  static Future<bool> setCurrencyLimit(String currencyId, double amount) async {
+    final response = await http.patch(
+      Uri.http("10.0.2.2:5230", "currency/$currencyId/limit", {"amount": amount.toStringAsFixed(2)}),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Accept": "*/*"
+      },
+    );
+
+    return response.statusCode == 200;
+  }
 }

@@ -1,7 +1,6 @@
 import "dart:io";
 
 import "package:file_picker/file_picker.dart";
-import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:image_picker/image_picker.dart";
@@ -12,7 +11,6 @@ import "../../controllers/evidence_cubit.dart";
 import "../../controllers/user_cubit.dart";
 import "../common/spaced_column.dart";
 import "../exchange_page/exchange_page.dart";
-import "../exchange_success_page/exchange_success_page.dart";
 
 enum AttachmentOption { photoLibrary, takePhoto, chooseFiles }
 

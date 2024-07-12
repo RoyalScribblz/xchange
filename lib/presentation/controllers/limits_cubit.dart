@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../data/dtos/currency.dart";
+import "../../data/repositories/currency_repository.dart";
 import "cubit_models/limits_data.dart";
 
 class LimitsCubit extends Cubit<LimitsData> {
@@ -42,6 +43,65 @@ class LimitsCubit extends Cubit<LimitsData> {
     }
 
     return filtered;
+  }
+
+  Future setCurrencyLimit(Currency currency) async {
+    final int index = state.currencies.indexOf(currency);
+    final double? amount = double.tryParse(state.controllers[index].text);
+
+    if (amount == null) {
+      return;
+    }
+
+    await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
+
+    state.currencies[index] = Currency(
+      currencyId: currency.currencyId,
+      name: currency.name,
+      currencyCode: currency.currencyCode,
+      flagImageUrl: currency.flagImageUrl,
+      symbol: currency.symbol,
+      usdValue: currency.usdValue,
+      transactionLimit: currency.transactionLimit,
+    );
+
+    emit(LimitsData(state.search, state.currencies, state.controllers));
+  }
+
+  Future setCurrencyLimits() async {
+    bool changed = false;
+
+    for (int i = 0; i < state.currencies.length; i++) {
+      final Currency currency = state.currencies[i];
+      final TextEditingController controller = state.controllers[i];
+
+      final double? amount = double.tryParse(controller.text);
+      if (currency.transactionLimit == amount) {
+        continue;
+      }
+
+      if (amount == null) {
+        continue;
+      }
+
+      await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
+
+      state.currencies[i] = Currency(
+        currencyId: currency.currencyId,
+        name: currency.name,
+        currencyCode: currency.currencyCode,
+        flagImageUrl: currency.flagImageUrl,
+        symbol: currency.symbol,
+        usdValue: currency.usdValue,
+        transactionLimit: currency.transactionLimit,
+      );
+
+      changed = true;
+    }
+
+    if (changed) {
+      emit(LimitsData(state.search, state.currencies, state.controllers));
+    }
   }
 }
 

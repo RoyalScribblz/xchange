@@ -3,8 +3,6 @@ import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../../fonts.dart";
-import "../../controllers/accounts_cubit.dart";
-import "../../controllers/cubit_models/user.dart";
 import "../../controllers/evidence_cubit.dart";
 import "../../controllers/home_page_cubit.dart";
 import "../../controllers/user_cubit.dart";

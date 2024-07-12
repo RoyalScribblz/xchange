@@ -10,7 +10,8 @@ class EvidenceRequestsCubit extends Cubit<EvidenceRequestsData> {
   EvidenceRequestsCubit() : super(EvidenceRequestsData([], {}, {}));
 
   Future initialise() async {
-    final List<EvidenceRequest> evidenceRequests = await EvidenceRequestRepository.getEvidenceRequests();
+    final List<EvidenceRequest> evidenceRequests =
+        await EvidenceRequestRepository.getEvidenceRequests();
 
     final Map<String, List<XFile>> files = {};
     final Map<String, PdfDocument> pdfDocuments = {};
@@ -18,9 +19,10 @@ class EvidenceRequestsCubit extends Cubit<EvidenceRequestsData> {
       final List<XFile> xFiles = [];
 
       for (String evidenceId in evidenceRequest.evidenceIds) {
-        final XFile? xFile = await EvidenceRequestRepository.getEvidence(evidenceId);
+        final XFile? xFile =
+            await EvidenceRequestRepository.getEvidence(evidenceId);
         if (xFile == null) {
-          break;
+          continue;
         }
 
         xFiles.add(xFile);
@@ -34,5 +36,43 @@ class EvidenceRequestsCubit extends Cubit<EvidenceRequestsData> {
     }
 
     emit(EvidenceRequestsData(evidenceRequests, files, pdfDocuments));
+  }
+
+  Future acceptEvidenceRequest(String evidenceRequestId) async {
+    final bool success = await EvidenceRequestRepository.acceptEvidenceRequest(
+        evidenceRequestId);
+
+    if (success) {
+      final List<XFile>? xFiles = state.files.remove(evidenceRequestId);
+
+      if (xFiles != null) {
+        for (var xFile in xFiles) {
+          state.pdfDocuments.remove(xFile.path);
+        }
+      }
+
+      state.evidenceRequests.removeWhere((e) => e.evidenceRequestId == evidenceRequestId);
+
+      emit(EvidenceRequestsData(state.evidenceRequests, state.files, state.pdfDocuments));
+    }
+  }
+
+  Future rejectEvidenceRequest(String evidenceRequestId) async {
+    final bool success = await EvidenceRequestRepository.rejectEvidenceRequest(
+        evidenceRequestId);
+
+    if (success) {
+      final List<XFile>? xFiles = state.files.remove(evidenceRequestId);
+
+      if (xFiles != null) {
+        for (var xFile in xFiles) {
+          state.pdfDocuments.remove(xFile.path);
+        }
+      }
+
+      state.evidenceRequests.removeWhere((e) => e.evidenceRequestId == evidenceRequestId);
+
+      emit(EvidenceRequestsData(state.evidenceRequests, state.files, state.pdfDocuments));
+    }
   }
 }
