@@ -1,17 +1,22 @@
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../../fonts.dart";
+import "../../controllers/evidence_cubit.dart";
 import "../exchange_page/exchange_page.dart";
+import "../frozen_page/frozen_page.dart";
 
 class SuccessPage extends StatelessWidget {
   const SuccessPage({
     super.key,
     required this.mainText,
     required this.subText,
+    this.frozen = false,
   });
 
   final String mainText;
   final String subText;
+  final bool frozen;
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +37,19 @@ class SuccessPage extends StatelessWidget {
             const Expanded(child: SizedBox()),
             ContinueButton(
               label: "Return Home",
-              onPressed: () => {
-                Navigator.of(context).popUntil((route) => route.isFirst)
+              onPressed: () {
+                final NavigatorState nav = Navigator.of(context);
+
+                if (frozen) {
+                  nav.push(MaterialPageRoute(builder: (_) => BlocProvider(
+                    create: (_) => EvidenceCubit(),
+                    child: const FrozenPage(),
+                  )));
+
+                  return;
+                }
+
+                nav.popUntil((route) => route.isFirst);
               },
             ),
           ],

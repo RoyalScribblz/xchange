@@ -34,7 +34,32 @@ class _AdminPageState extends State<AdminPage> {
       resizeToAvoidBottomInset: true,
       floatingActionButton: currentPageIndex == 0
           ? FloatingActionButton(
-              onPressed: () async => await limitsCubit.setCurrencyLimits(),
+              onPressed: () async {
+                final Map<String, String> changedValues =
+                    await limitsCubit.setCurrencyLimits();
+
+                if (changedValues.isNotEmpty) {
+                  if (context.mounted) {
+                    final String content = changedValues.entries
+                        .map((e) => "${e.key}: ${e.value}")
+                        .join(",\n");
+
+                    await showDialog(
+                      context: context,
+                      builder: (BuildContext localContext) => AlertDialog(
+                        title: const Text("Successfully applied new limits"),
+                        content: Text(content),
+                        actions: [
+                          TextButton(
+                            child: const Text("OK"),
+                            onPressed: () => Navigator.of(localContext).pop(),
+                          )
+                        ],
+                      ),
+                    );
+                  }
+                }
+              },
               child: const Icon(Icons.check),
             )
           : null,
@@ -131,7 +156,30 @@ class _LimitsPageState extends State<LimitsPage> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () => limitsCubit.setCurrencyLimit(currency),
+                          onPressed: () async {
+                            final double? amount =
+                                await limitsCubit.setCurrencyLimit(currency);
+                            if (amount != null && context.mounted) {
+                              // TODO bug this shows a second time if u press again
+                              await showDialog(
+                                context: context,
+                                builder: (BuildContext localContext) =>
+                                    AlertDialog(
+                                  title: const Text(
+                                      "Successfully applied new limit"),
+                                  content: Text(
+                                      "${currency.currencyCode}: ${amount.toStringAsFixed(2)}"),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text("OK"),
+                                      onPressed: () =>
+                                          Navigator.of(localContext).pop(),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                          },
                           icon: const Icon(Icons.check),
                         ),
                       ],
@@ -216,8 +264,8 @@ class _RequestsPageState extends State<RequestsPage> {
                     SpacedColumn(
                       spaceHeight: 5,
                       children: [
-                        for (XFile xFile in evidenceRequestsCubit.state.files[
-                            requests[i].evidenceRequestId]!)
+                        for (XFile xFile in evidenceRequestsCubit
+                            .state.files[requests[i].evidenceRequestId]!)
                           Row(
                             children: [
                               xFile.mimeType == "application/pdf"

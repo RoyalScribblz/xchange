@@ -38,9 +38,16 @@ class EvidenceRequestRepository {
     await request.send();
   }
 
-  static Future<EvidenceRequest?> getEvidenceRequest(String userId) async {
+  static Future<EvidenceRequest?> getEvidenceRequest(String userId, EvidenceRequestStatus status) async {
+    final String statusString = switch (status) {
+      EvidenceRequestStatus.waiting => "0",
+      EvidenceRequestStatus.active => "1",
+      EvidenceRequestStatus.rejected => "2",
+      EvidenceRequestStatus.accepted => "3",
+    };
+
     final response = await http.get(
-      Uri.http("10.0.2.2:5230", "evidenceRequest", {"userId": userId}),
+      Uri.http("10.0.2.2:5230", "evidenceRequest", {"userId": userId, "evidenceRequestStatus": statusString}),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",

@@ -30,11 +30,14 @@ class EvidenceRequest {
 @JsonEnum()
 enum EvidenceRequestStatus {
   @JsonValue(0)
-  active,
+  waiting,
 
   @JsonValue(1)
-  rejected,
+  active,
 
   @JsonValue(2)
+  rejected,
+
+  @JsonValue(3)
   accepted,
 }

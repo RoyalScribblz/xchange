@@ -2,6 +2,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "package:image_picker/image_picker.dart";
 import "package:pdfrx/pdfrx.dart";
 
+import "../../data/dtos/evidence_request.dart";
 import "../../data/repositories/evidence_request_repository.dart";
 import "cubit_models/evidence_submission.dart";
 
@@ -75,7 +76,7 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
 
   Future initialise(String userId) async {
     final evidenceRequest =
-        await EvidenceRequestRepository.getEvidenceRequest(userId);
+        await EvidenceRequestRepository.getEvidenceRequest(userId, EvidenceRequestStatus.waiting);
 
     if (evidenceRequest != null) {
       emit(EvidenceSubmission(

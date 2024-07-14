@@ -54,7 +54,7 @@ class ExchangePage extends StatelessWidget {
                           ),
                           const SizedBox(width: 5),
                           const Icon(
-                              Icons.info_outline) // TODO make this do something
+                              Icons.info_outline)
                         ],
                       ),
                     ],

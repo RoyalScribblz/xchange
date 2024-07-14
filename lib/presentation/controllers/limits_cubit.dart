@@ -45,31 +45,36 @@ class LimitsCubit extends Cubit<LimitsData> {
     return filtered;
   }
 
-  Future setCurrencyLimit(Currency currency) async {
+  Future<double?> setCurrencyLimit(Currency currency) async {
     final int index = state.currencies.indexOf(currency);
     final double? amount = double.tryParse(state.controllers[index].text);
 
     if (amount == null) {
-      return;
+      return null;
     }
 
-    await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
+    final bool success = await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
 
-    state.currencies[index] = Currency(
-      currencyId: currency.currencyId,
-      name: currency.name,
-      currencyCode: currency.currencyCode,
-      flagImageUrl: currency.flagImageUrl,
-      symbol: currency.symbol,
-      usdValue: currency.usdValue,
-      transactionLimit: currency.transactionLimit,
-    );
+    if (success) {
+      state.currencies[index] = Currency(
+        currencyId: currency.currencyId,
+        name: currency.name,
+        currencyCode: currency.currencyCode,
+        flagImageUrl: currency.flagImageUrl,
+        symbol: currency.symbol,
+        usdValue: currency.usdValue,
+        transactionLimit: currency.transactionLimit,
+      );
 
-    emit(LimitsData(state.search, state.currencies, state.controllers));
+      emit(LimitsData(state.search, state.currencies, state.controllers));
+      return amount;
+    }
+
+    return null;
   }
 
-  Future setCurrencyLimits() async {
-    bool changed = false;
+  Future<Map<String, String>> setCurrencyLimits() async {
+    final Map<String, String> changedValues = {};
 
     for (int i = 0; i < state.currencies.length; i++) {
       final Currency currency = state.currencies[i];
@@ -84,24 +89,28 @@ class LimitsCubit extends Cubit<LimitsData> {
         continue;
       }
 
-      await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
+      final bool success = await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
 
-      state.currencies[i] = Currency(
-        currencyId: currency.currencyId,
-        name: currency.name,
-        currencyCode: currency.currencyCode,
-        flagImageUrl: currency.flagImageUrl,
-        symbol: currency.symbol,
-        usdValue: currency.usdValue,
-        transactionLimit: currency.transactionLimit,
-      );
+      if (success) {
+        state.currencies[i] = Currency(
+          currencyId: currency.currencyId,
+          name: currency.name,
+          currencyCode: currency.currencyCode,
+          flagImageUrl: currency.flagImageUrl,
+          symbol: currency.symbol,
+          usdValue: currency.usdValue,
+          transactionLimit: currency.transactionLimit,
+        );
 
-      changed = true;
+        changedValues[currency.currencyCode] = amount.toStringAsFixed(2);
+      }
     }
 
-    if (changed) {
+    if (changedValues.isNotEmpty) {
       emit(LimitsData(state.search, state.currencies, state.controllers));
     }
+
+    return changedValues;
   }
 }
 

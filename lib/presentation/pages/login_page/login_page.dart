@@ -2,10 +2,13 @@ import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
+import "../../../extensions/credentials_extensions.dart";
 import "../../../fonts.dart";
 import "../../controllers/evidence_cubit.dart";
 import "../../controllers/home_page_cubit.dart";
+import "../../controllers/limits_cubit.dart";
 import "../../controllers/user_cubit.dart";
+import "../admin_page/admin_page.dart";
 import "../frozen_page/frozen_page.dart";
 import "../home_page/home_page.dart";
 
@@ -32,12 +35,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final UserCubit userCubit = context.watch<UserCubit>();
 
-    // return BlocProvider(
-    //   create: (_) => EvidenceCubit(),
-    //   child: FrozenPage(),
-    // );
-    // TODO remove
-
     if (userCubit.state.credentials == null) {
       return Scaffold(
         body: SafeArea(
@@ -62,7 +59,21 @@ class _LoginPageState extends State<LoginPage> {
     // TODO account creation page
     // }
 
-    return BlocProvider(create: (_) => EvidenceCubit(), child: const FrozenPage());
+    if (userCubit.state.credentials.isAdmin()) {
+      return BlocProvider(
+        create: (_) => LimitsCubit(),
+        child: const AdminPage(),
+      );
+    }
+
+    // TODO FrozenSubmissionPendingPage when theres an active request not waiting and maybe put it on user
+
+    if (userCubit.state.user?.isFrozen == true) {
+      return BlocProvider(
+        create: (_) => EvidenceCubit(),
+        child: const FrozenPage(),
+      );
+    }
 
     return BlocProvider(
       create: (_) => HomePageCubit(),

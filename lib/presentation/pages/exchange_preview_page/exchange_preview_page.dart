@@ -4,6 +4,8 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "../../../data/contracts/get_accounts_response.dart";
 import "../../../data/contracts/pending_exchange.dart";
 import "../../../data/dtos/currency.dart";
+import "../../../data/dtos/evidence_request.dart";
+import "../../../data/repositories/evidence_request_repository.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/currencies_cubit.dart";
@@ -135,11 +137,14 @@ class ExchangePreviewPage extends StatelessWidget {
 
                 accountsCubit.set(accounts);
 
+                final EvidenceRequest? evidenceRequest = await EvidenceRequestRepository.getEvidenceRequest(userCubit.state.user!.userId, EvidenceRequestStatus.waiting);
+
                 await nav.push(
                   MaterialPageRoute(
                     builder: (_) => SuccessPage(
                       mainText: "Converted ${fromCurrency.symbol}${pendingExchange.fromAmount.toStringAsFixed(2)} ${fromCurrency.currencyCode} to",
                       subText: "${toCurrency.symbol}${pendingExchange.toAmount.toStringAsFixed(2)} ${toCurrency.currencyCode}",
+                      frozen: evidenceRequest != null,
                     ),
                   ),
                 );
