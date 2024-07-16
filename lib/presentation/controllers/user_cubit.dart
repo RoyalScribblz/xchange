@@ -7,14 +7,14 @@ import "../../data/repositories/user_repository.dart";
 import "cubit_models/user.dart";
 
 class UserCubit extends Cubit<User> {
-  UserCubit() : super(User(null, null));
+  UserCubit() : super(User(null, null, null));
 
-  Future login(Credentials credentials) async {
+  Future login(Credentials credentials, Auth0 auth0) async {
     GetUserResponse? user = await UserRepository.getUser(credentials.user.sub);
 
     user ??= await UserRepository.createUser(credentials.user.sub);
 
-    emit(User(credentials, user));
+    emit(User(credentials, user, auth0));
   }
 
   Future updateLocalCurrency(String currencyId) async {
@@ -35,6 +35,12 @@ class UserCubit extends Cubit<User> {
         isFrozen: state.user!.isFrozen,
         isBanned: state.user!.isBanned,
       ),
+      state.auth0,
     ));
+  }
+
+  Future logout() async {
+    await state.auth0?.webAuthentication(scheme: "xchange").logout();
+    emit(User(null, null, null));
   }
 }

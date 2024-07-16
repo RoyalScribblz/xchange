@@ -52,6 +52,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     "Profile",
                     style: Fonts.neueBold(15),
                   ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.logout),
+                    onPressed: () async {
+                      await context.read<UserCubit>().logout();
+                      nav.pop();
+                    },
+                  ),
                 )
               ],
             ),

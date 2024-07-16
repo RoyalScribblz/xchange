@@ -1,5 +1,6 @@
 import "dart:io";
 
+import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:image_picker/image_picker.dart";
@@ -11,6 +12,7 @@ import "../../../fonts.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/evidence_requests_cubit.dart";
 import "../../controllers/limits_cubit.dart";
+import "../../controllers/user_cubit.dart";
 import "../common/spaced_column.dart";
 import "../common/square_image.dart";
 
@@ -24,7 +26,7 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
-  int currentPageIndex = 1;
+  int currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,28 @@ class _AdminPageState extends State<AdminPage> {
       floatingActionButton: currentPageIndex == 0
           ? FloatingActionButton(
               onPressed: () async {
+                final List<String> invalidTexts =
+                    limitsCubit.invalidControllerTexts();
+
+                if (invalidTexts.isNotEmpty) {
+                  final String content = invalidTexts.join(",\n");
+
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext localContext) => AlertDialog(
+                      title: const Text("Invalid Inputs"),
+                      content: Text(
+                          "Amount should only contain digits and decimals. The following are invalid: \n$content"),
+                      actions: [
+                        TextButton(
+                          child: const Text("OK"),
+                          onPressed: () => Navigator.of(localContext).pop(),
+                        )
+                      ],
+                    ),
+                  );
+                }
+
                 final Map<String, String> changedValues =
                     await limitsCubit.setCurrencyLimits();
 
@@ -63,7 +87,7 @@ class _AdminPageState extends State<AdminPage> {
               child: const Icon(Icons.check),
             )
           : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (index) =>
             setState(() => currentPageIndex = index),
@@ -123,10 +147,20 @@ class _LimitsPageState extends State<LimitsPage> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-          child: TextField(
-            decoration: const InputDecoration(hintText: "Search"),
-            onChanged: (value) => limitsCubit.setSearch(value),
+          padding: const EdgeInsets.only(left: 15, bottom: 15),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  decoration: const InputDecoration(hintText: "Search"),
+                  onChanged: (value) => limitsCubit.setSearch(value),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () async => await context.read<UserCubit>().logout(),
+              ),
+            ],
           ),
         ),
         Expanded(
@@ -152,11 +186,32 @@ class _LimitsPageState extends State<LimitsPage> {
                         SizedBox(
                           width: 100,
                           child: TextField(
+                            keyboardType: TextInputType.number,
                             controller: filtered[currency],
                           ),
                         ),
                         IconButton(
                           onPressed: () async {
+                            if (!limitsCubit.controllerTextValid(currency) &&
+                                context.mounted) {
+                              await showDialog(
+                                context: context,
+                                builder: (BuildContext localContext) =>
+                                    AlertDialog(
+                                  title: const Text("Invalid Input"),
+                                  content: const Text(
+                                      "Amount should only contain digits and decimals, for example: `25.62`"),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text("OK"),
+                                      onPressed: () =>
+                                          Navigator.of(localContext).pop(),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+
                             final double? amount =
                                 await limitsCubit.setCurrencyLimit(currency);
                             if (amount != null && context.mounted) {

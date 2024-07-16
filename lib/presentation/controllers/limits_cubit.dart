@@ -112,6 +112,25 @@ class LimitsCubit extends Cubit<LimitsData> {
 
     return changedValues;
   }
+
+  bool controllerTextValid(Currency currency) {
+    final int index = state.currencies.indexOf(currency);
+    final double? amount = double.tryParse(state.controllers[index].text);
+    return amount != null;
+  }
+
+  List<String> invalidControllerTexts() {
+    final List<String> invalidCurrencies = [];
+    for (int i = 0; i < state.currencies.length; i++) {
+      final Currency currency = state.currencies[i];
+      final TextEditingController controller = state.controllers[i];
+      final double? amount = double.tryParse(controller.text);
+      if (amount == null) {
+        invalidCurrencies.add(currency.currencyCode);
+      }
+    }
+    return invalidCurrencies;
+  }
 }
 
 extension StringExtensions on String {

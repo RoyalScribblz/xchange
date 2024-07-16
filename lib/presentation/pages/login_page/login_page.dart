@@ -38,16 +38,25 @@ class _LoginPageState extends State<LoginPage> {
     if (userCubit.state.credentials == null) {
       return Scaffold(
         body: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              ElevatedButton(
-                onPressed: () async {
-                  final credentials =
-                      await auth0.webAuthentication(scheme: "xchange").login();
+              Align(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Xchange", style: Fonts.neueLight(50)),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final credentials =
+                            await auth0.webAuthentication(scheme: "xchange").login();
 
-                  await userCubit.login(credentials);
-                },
-                child: Text("Login", style: Fonts.neueMedium(20)),
+                        await userCubit.login(credentials, auth0);
+                      },
+                      child: Text("Login", style: Fonts.neueMedium(20)),
+                    ),
+                  ],
+                ),
               )
             ],
           ),
