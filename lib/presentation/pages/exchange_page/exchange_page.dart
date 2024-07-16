@@ -83,10 +83,9 @@ class ExchangePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   child: Row(
                     children: [
-                      const Expanded(child: SizedBox()),
                       PopupMenuButton<Currency>(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -96,7 +95,7 @@ class ExchangePage extends StatelessWidget {
                                   exchangeCubit.state.fromCurrency.flagImageUrl,
                               size: 50,
                             ),
-                            const SizedBox(width: 15),
+                            const SizedBox(width: 10),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -133,12 +132,12 @@ class ExchangePage extends StatelessWidget {
                               .toList();
                         },
                       ),
-                      const SizedBox(width: 30),
+                      const Expanded(child: SizedBox()),
                       ElevatedButton(
                         onPressed: () => exchangeCubit.swapToAndFromCurrency(),
                         child: const Icon(Icons.swap_horiz),
                       ),
-                      const SizedBox(width: 30),
+                      const Expanded(child: SizedBox()),
                       PopupMenuButton<Currency>(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -153,7 +152,7 @@ class ExchangePage extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(width: 15),
+                            const SizedBox(width: 10),
                             SquareImage(
                               assetPath:
                                   exchangeCubit.state.toCurrency.flagImageUrl,
@@ -185,7 +184,6 @@ class ExchangePage extends StatelessWidget {
                               .toList();
                         },
                       ),
-                      const Expanded(child: SizedBox()),
                     ],
                   ),
                 ),
@@ -213,6 +211,27 @@ class ExchangePage extends StatelessWidget {
             ContinueButton(
               label: "Preview Exchange",
               onPressed: () async {
+                final bool valid = exchangeCubit.exchangeIsValid(accountsCubit.state);
+
+                if (!valid) {
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext localContext) => AlertDialog(
+                      title: const Text("Invalid Exchange"),
+                      content: const Text(
+                          "Cannot exchange more than your total balance."),
+                      actions: [
+                        TextButton(
+                          child: const Text("OK"),
+                          onPressed: () => Navigator.of(localContext).pop(),
+                        )
+                      ],
+                    ),
+                  );
+
+                  return;
+                }
+
                 final bool success = await exchangeCubit
                     .createExchange(userCubit.state.user!.userId);
 

@@ -148,6 +148,7 @@ class CurrencyTile extends StatelessWidget {
     final NavigatorState nav = Navigator.of(context);
     final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
     final HomePageCubit homePageCubit = context.watch<HomePageCubit>();
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     return Column(
       children: [
@@ -194,7 +195,7 @@ class CurrencyTile extends StatelessWidget {
                             accountsCubit.state
                                 .singleWhere((a) =>
                                     a.currency.currencyId ==
-                                    "6c84631c-838b-403e-8e2b-38614d2e907d")
+                                    userCubit.state.user!.localCurrency.currencyId)
                                 .currency,
                           ),
                           child: const ExchangePage(),

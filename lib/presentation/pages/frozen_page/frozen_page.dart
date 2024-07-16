@@ -224,3 +224,37 @@ class FrozenSubmissionPendingPage extends StatelessWidget {
     );
   }
 }
+
+class BannedPage extends StatelessWidget {
+  const BannedPage({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              children: [
+                const Expanded(child: SizedBox()),
+                const Icon(Icons.cancel, size: 150),
+                Text(
+                  "Account Banned",
+                  style: Fonts.neueMedium(20),
+                ),
+                Text(
+                  "",
+                  style: Fonts.neueBold(30),
+                ),
+                const Expanded(child: SizedBox()),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

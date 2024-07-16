@@ -7,7 +7,7 @@ import "../../data/repositories/evidence_request_repository.dart";
 import "cubit_models/evidence_submission.dart";
 
 class EvidenceCubit extends Cubit<EvidenceSubmission> {
-  EvidenceCubit() : super(EvidenceSubmission("", [], [], []));
+  EvidenceCubit() : super(EvidenceSubmission(null, [], [], []));
 
   void addImages(List<XFile> newImages) {
     if (newImages.isEmpty) {
@@ -22,7 +22,7 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
     }
 
     emit(EvidenceSubmission(
-        state.evidenceId, images, state.pdfs, state.pdfDocuments));
+        state.evidenceRequest, images, state.pdfs, state.pdfDocuments));
   }
 
   void addImage(XFile? image) {
@@ -36,7 +36,7 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
     images.add(image);
 
     emit(EvidenceSubmission(
-        state.evidenceId, images, state.pdfs, state.pdfDocuments));
+        state.evidenceRequest, images, state.pdfs, state.pdfDocuments));
   }
 
   Future addPdfs(List<XFile>? newPdfs) async {
@@ -57,13 +57,13 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
     }
 
     emit(
-        EvidenceSubmission(state.evidenceId, state.images, pdfs, pdfDocuments));
+        EvidenceSubmission(state.evidenceRequest, state.images, pdfs, pdfDocuments));
   }
 
   void removeImage(XFile image) {
     if (state.images.remove(image)) {
       emit(EvidenceSubmission(
-          state.evidenceId, state.images, state.pdfs, state.pdfDocuments));
+          state.evidenceRequest, state.images, state.pdfs, state.pdfDocuments));
     }
   }
 
@@ -71,16 +71,16 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
     state.pdfs.removeAt(index);
     state.pdfDocuments.removeAt(index);
     emit(EvidenceSubmission(
-        state.evidenceId, state.images, state.pdfs, state.pdfDocuments));
+        state.evidenceRequest, state.images, state.pdfs, state.pdfDocuments));
   }
 
   Future initialise(String userId) async {
     final evidenceRequest =
-        await EvidenceRequestRepository.getEvidenceRequest(userId, EvidenceRequestStatus.waiting);
+        await EvidenceRequestRepository.getEvidenceRequest(userId);
 
     if (evidenceRequest != null) {
       emit(EvidenceSubmission(
-        evidenceRequest.evidenceRequestId,
+        evidenceRequest,
         state.images,
         state.pdfs,
         state.pdfDocuments,
@@ -90,7 +90,7 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
 
   Future submitEvidence() async {
     await EvidenceRequestRepository.submitEvidence(
-      state.evidenceId,
+      state.evidenceRequest!.evidenceRequestId,
       [...state.images, ...state.pdfs],
     );
   }

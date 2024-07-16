@@ -2,6 +2,7 @@ import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
+import "../../../data/dtos/evidence_request.dart";
 import "../../../extensions/credentials_extensions.dart";
 import "../../../fonts.dart";
 import "../../controllers/evidence_cubit.dart";
@@ -34,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final UserCubit userCubit = context.watch<UserCubit>();
+    final EvidenceCubit evidenceCubit = context.watch<EvidenceCubit>();
 
     if (userCubit.state.credentials == null) {
       return Scaffold(
@@ -52,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
                             await auth0.webAuthentication(scheme: "xchange").login();
 
                         await userCubit.login(credentials, auth0);
+                        await evidenceCubit.initialise(userCubit.state.user!.userId);
                       },
                       child: Text("Login", style: Fonts.neueMedium(20)),
                     ),
@@ -75,13 +78,16 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    // TODO FrozenSubmissionPendingPage when theres an active request not waiting and maybe put it on user
+    if (evidenceCubit.state.evidenceRequest != null && evidenceCubit.state.evidenceRequest?.status == EvidenceRequestStatus.rejected) {
+      return const BannedPage();
+    }
 
-    if (userCubit.state.user?.isFrozen == true) {
-      return BlocProvider(
-        create: (_) => EvidenceCubit(),
-        child: const FrozenPage(),
-      );
+    if (evidenceCubit.state.evidenceRequest != null && evidenceCubit.state.evidenceRequest?.status == EvidenceRequestStatus.active) {
+      return const FrozenSubmissionPendingPage();
+    }
+
+    if (evidenceCubit.state.evidenceRequest != null && evidenceCubit.state.evidenceRequest?.status == EvidenceRequestStatus.waiting) {
+      return const FrozenPage();
     }
 
     return BlocProvider(

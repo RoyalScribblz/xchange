@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
 import "../../data/contracts/get_accounts_response.dart";
@@ -122,5 +123,22 @@ class ExchangeCubit extends Cubit<ExchangeRequest> {
 
     return await AccountRepository.completeExchange(
         userId, state.pendingExchange!.pendingExchangeId);
+  }
+
+  bool exchangeIsValid(List<GetAccountsResponse> accounts) {
+    final double? amountDouble = double.tryParse(state.amount);
+
+    if (amountDouble == null) {
+      return false;
+    }
+
+    final GetAccountsResponse? account = accounts.firstWhereOrNull(
+        (a) => a.currency.currencyId == state.fromCurrency.currencyId);
+
+    if (account == null || amountDouble > account.balance) {
+      return false;
+    }
+
+    return true;
   }
 }

@@ -137,7 +137,7 @@ class ExchangePreviewPage extends StatelessWidget {
 
                 accountsCubit.set(accounts);
 
-                final EvidenceRequest? evidenceRequest = await EvidenceRequestRepository.getEvidenceRequest(userCubit.state.user!.userId, EvidenceRequestStatus.waiting);
+                final EvidenceRequest? evidenceRequest = await EvidenceRequestRepository.getEvidenceRequest(userCubit.state.user!.userId);
 
                 await nav.push(
                   MaterialPageRoute(

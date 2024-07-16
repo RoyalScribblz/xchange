@@ -41,10 +41,7 @@ class SuccessPage extends StatelessWidget {
                 final NavigatorState nav = Navigator.of(context);
 
                 if (frozen) {
-                  nav.push(MaterialPageRoute(builder: (_) => BlocProvider(
-                    create: (_) => EvidenceCubit(),
-                    child: const FrozenPage(),
-                  )));
+                  nav.push(MaterialPageRoute(builder: (_) => const FrozenPage()));
 
                   return;
                 }
