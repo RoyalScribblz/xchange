@@ -211,6 +211,26 @@ class ExchangePage extends StatelessWidget {
             ContinueButton(
               label: "Preview Exchange",
               onPressed: () async {
+                final double? amount = double.tryParse(exchangeCubit.state.amount);
+                if (amount == null || amount <= 0) {
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext localContext) => AlertDialog(
+                      title: const Text("Invalid Exchange"),
+                      content: const Text(
+                          "Cannot exchange less than 0.01"),
+                      actions: [
+                        TextButton(
+                          child: const Text("OK"),
+                          onPressed: () => Navigator.of(localContext).pop(),
+                        )
+                      ],
+                    ),
+                  );
+
+                  return;
+                }
+
                 final bool valid = exchangeCubit.exchangeIsValid(accountsCubit.state);
 
                 if (!valid) {
