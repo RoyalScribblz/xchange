@@ -64,4 +64,29 @@ class DepositCubit extends Cubit<DepositRequest> {
       ),
     );
   }
+
+  String validate() {
+    String response = "";
+    if (state.cardholderName.isEmpty) {
+      response += "Card Holder name is invalid. Cannot be empty.\n";
+    }
+
+    final int cardNumbers = state.cardNumber.replaceAll(" ", "").length;
+    if (cardNumbers != 15 && cardNumbers != 16) {
+      response += "Card Number is invalid. Should be 15 or 16 digits.\n";
+    }
+
+    final RegExp regExp = RegExp(r"^(0[1-9]|1[0-2])\/\d{2}$");
+    if (!regExp.hasMatch(state.expiryDate)) {
+      response += "Expiry Date is invalid. Should be in MM/yy format.\n";
+    }
+
+    final cvv = int.tryParse(state.cvvCvc);
+    final int cvvLength = cvv.toString().length;
+    if (state.cvvCvc.isEmpty || cvv == null || (cvvLength != 3 && cvvLength != 4)) {
+      response += "CVV/CVC is invalid. Should be 3 or 4 digits.\n";
+    }
+
+    return response;
+  }
 }

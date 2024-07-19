@@ -102,6 +102,7 @@ class DepositPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 15),
                           TextField(
+                            keyboardType: TextInputType.number,
                             onChanged: (String cardNumber) =>
                                 depositCubit.setCardNumber(cardNumber),
                             decoration: InputDecoration(
@@ -111,6 +112,7 @@ class DepositPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 15),
                           TextField(
+                            keyboardType: TextInputType.phone,
                             onChanged: (String expiryDate) =>
                                 depositCubit.setExpiryDate(expiryDate),
                             decoration: InputDecoration(
@@ -120,6 +122,7 @@ class DepositPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 15),
                           TextField(
+                            keyboardType: TextInputType.number,
                             onChanged: (String cvvCvc) =>
                                 depositCubit.setCvvCvc(cvvCvc),
                             decoration: InputDecoration(
@@ -135,6 +138,27 @@ class DepositPage extends StatelessWidget {
                     ContinueButton(
                       label: "Confirm Deposit",
                       onPressed: () async {
+                        final validation = depositCubit.validate();
+
+                        if (validation.isNotEmpty) {
+                          await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Invalid Input", style: Fonts.neueMedium(15)),
+                                content: Text(validation),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: Text("OK", style: Fonts.neueMedium(15)),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          return;
+                        }
+
                         final bool success = await accountsCubit.deposit(
                             account.accountId, depositCubit.state.amount);
 

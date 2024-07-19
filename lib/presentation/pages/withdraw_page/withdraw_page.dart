@@ -113,6 +113,27 @@ class WithdrawPage extends StatelessWidget {
             ContinueButton(
               label: "Confirm Withdrawal",
               onPressed: () async {
+                final validation = withdrawCubit.validate();
+
+                if (validation.isNotEmpty) {
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text("Invalid Input", style: Fonts.neueMedium(15)),
+                        content: Text(validation),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text("OK", style: Fonts.neueMedium(15)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  return;
+                }
+
                 final bool success = await accountsCubit.withdraw(
                     account.accountId, withdrawCubit.state.amount);
 
