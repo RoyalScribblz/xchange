@@ -211,6 +211,25 @@ class ExchangePage extends StatelessWidget {
             ContinueButton(
               label: "Preview Exchange",
               onPressed: () async {
+                if (exchangeCubit.state.fromCurrency.currencyId == exchangeCubit.state.toCurrency.currencyId) {
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext localContext) => AlertDialog(
+                      title: const Text("Invalid Exchange"),
+                      content: const Text(
+                          "Cannot convert a currency to itself."),
+                      actions: [
+                        TextButton(
+                          child: const Text("OK"),
+                          onPressed: () => Navigator.of(localContext).pop(),
+                        )
+                      ],
+                    ),
+                  );
+
+                  return;
+                }
+
                 final double? amount = double.tryParse(exchangeCubit.state.amount);
                 if (amount == null || amount <= 0) {
                   await showDialog(
@@ -239,7 +258,7 @@ class ExchangePage extends StatelessWidget {
                     builder: (BuildContext localContext) => AlertDialog(
                       title: const Text("Invalid Exchange"),
                       content: const Text(
-                          "Cannot exchange more than your total balance."),
+                          "Amount exceeds your total balance."),
                       actions: [
                         TextButton(
                           child: const Text("OK"),

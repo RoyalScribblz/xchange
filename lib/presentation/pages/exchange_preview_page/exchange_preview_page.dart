@@ -53,7 +53,7 @@ class ExchangePreviewPage extends StatelessWidget {
             ),
             const SizedBox(height: 50),
             Text(
-              "${toCurrency.currencyCode} ${pendingExchange.toAmount}",
+              "${toCurrency.currencyCode} ${pendingExchange.toAmount.toStringAsFixed(2)}",
               style: Fonts.neueMedium(30),
             ),
             const SizedBox(height: 50),
