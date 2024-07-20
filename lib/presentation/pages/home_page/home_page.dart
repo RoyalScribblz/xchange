@@ -235,7 +235,7 @@ class CurrencyTile extends StatelessWidget {
                     onPressed: () async => await nav.push(
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
-                          create: (_) => WithdrawCubit(),
+                          create: (_) => WithdrawCubit(account.balance),
                           child: WithdrawPage(account: account),
                         ),
                       ),

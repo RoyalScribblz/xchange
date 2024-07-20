@@ -98,6 +98,7 @@ class WithdrawPage extends StatelessWidget {
                       label: Text("IBAN", style: Fonts.neueMedium(20)),
                     ),
                     style: Fonts.neueLight(20),
+                    onChanged: (value) => withdrawCubit.setIban(value),
                   ),
                   const SizedBox(height: 15),
                   TextField(
@@ -105,6 +106,7 @@ class WithdrawPage extends StatelessWidget {
                       label: Text("SWIFTBIC", style: Fonts.neueMedium(20)),
                     ),
                     style: Fonts.neueLight(20),
+                    onChanged: (value) => withdrawCubit.setSwiftBic(value),
                   ),
                 ],
               ),
@@ -113,6 +115,44 @@ class WithdrawPage extends StatelessWidget {
             ContinueButton(
               label: "Confirm Withdrawal",
               onPressed: () async {
+                if (withdrawCubit.state.amount > account.balance) {
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text("Invalid Withdrawal", style: Fonts.neueMedium(15)),
+                        content: const Text("Cannot withdraw more than your balance."),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text("OK", style: Fonts.neueMedium(15)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  return;
+                }
+
+                if (withdrawCubit.state.amount <= 0) {
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text("Invalid Withdrawal", style: Fonts.neueMedium(15)),
+                        content: const Text("Amount to withdraw must be more than 0."),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text("OK", style: Fonts.neueMedium(15)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  return;
+                }
+
                 final validation = withdrawCubit.validate();
 
                 if (validation.isNotEmpty) {

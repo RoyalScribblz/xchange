@@ -138,6 +138,25 @@ class DepositPage extends StatelessWidget {
                     ContinueButton(
                       label: "Confirm Deposit",
                       onPressed: () async {
+                        if (depositCubit.state.amount <= 0) {
+                          await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Invalid Deposit", style: Fonts.neueMedium(15)),
+                                content: const Text("Amount to deposit must be more than 0."),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: Text("OK", style: Fonts.neueMedium(15)),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          return;
+                        }
+
                         final validation = depositCubit.validate();
 
                         if (validation.isNotEmpty) {

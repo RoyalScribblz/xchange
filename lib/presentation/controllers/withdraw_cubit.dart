@@ -3,7 +3,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "cubit_models/withdraw_request.dart";
 
 class WithdrawCubit extends Cubit<WithdrawRequest> {
-  WithdrawCubit() : super(WithdrawRequest(100, "", ""));
+  WithdrawCubit(double balance) : super(WithdrawRequest(balance, "", ""));
 
   void setAmount(double amount) {
     emit(
@@ -30,7 +30,7 @@ class WithdrawCubit extends Cubit<WithdrawRequest> {
       response += "IBAN is invalid. Check IBAN formatting.\n";
     }
 
-    final swiftBicRegex = RegExp(r"^[A-Z]{4}[-]{0,1}[A-Z]{2}[-]{0,1}[A-Z0-9]{2}[-]{0,1}[0-9]{3}$");
+    final swiftBicRegex = RegExp(r"^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$");
     if (!swiftBicRegex.hasMatch(state.swiftBic)) {
       response += "SWIFTBIC is invalid. Check SWIFTBIC formatting.\n";
     }

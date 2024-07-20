@@ -214,6 +214,28 @@ class _LimitsPageState extends State<LimitsPage> {
 
                             final double? amount =
                                 await limitsCubit.setCurrencyLimit(currency);
+
+                            if (amount != null && amount <= 0 && context.mounted) {
+                              await showDialog(
+                                context: context,
+                                builder: (BuildContext localContext) =>
+                                    AlertDialog(
+                                      title: const Text(
+                                          "Invalid Limit"),
+                                      content: const Text(
+                                          "Limit must be non-zero and positive."),
+                                      actions: [
+                                        TextButton(
+                                          child: const Text("OK"),
+                                          onPressed: () =>
+                                              Navigator.of(localContext).pop(),
+                                        )
+                                      ],
+                                    ),
+                              );
+                              return;
+                            }
+
                             if (amount != null && context.mounted) {
                               // TODO bug this shows a second time if u press again
                               await showDialog(
