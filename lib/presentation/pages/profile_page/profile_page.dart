@@ -116,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () async {
                         await userCubit.updateLocalCurrency(selectedCurrency);
                         await accountsCubit
-                            .update(userCubit.state.user!.userId);
+                            .update(userCubit.state.credentials);
 
                         nav.pop();
                       },

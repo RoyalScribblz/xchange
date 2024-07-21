@@ -9,6 +9,7 @@ import "package:pdfrx/pdfrx.dart";
 import "../../../data/dtos/currency.dart";
 import "../../../data/dtos/evidence_request.dart";
 import "../../../fonts.dart";
+import "../../controllers/cubit_models/user.dart";
 import "../../controllers/currencies_cubit.dart";
 import "../../controllers/evidence_requests_cubit.dart";
 import "../../controllers/limits_cubit.dart";
@@ -31,6 +32,7 @@ class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     final LimitsCubit limitsCubit = context.watch<LimitsCubit>();
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -59,8 +61,8 @@ class _AdminPageState extends State<AdminPage> {
                   );
                 }
 
-                final Map<String, String> changedValues =
-                    await limitsCubit.setCurrencyLimits();
+                final Map<String, String> changedValues = await limitsCubit
+                    .setCurrencyLimits(userCubit.state.credentials);
 
                 if (changedValues.isNotEmpty) {
                   if (context.mounted) {
@@ -144,6 +146,8 @@ class _LimitsPageState extends State<LimitsPage> {
     final Map<Currency, TextEditingController> filtered =
         limitsCubit.getFilteredCurrencies();
 
+    final UserCubit userCubit = context.watch<UserCubit>();
+
     return Column(
       children: [
         Padding(
@@ -213,25 +217,27 @@ class _LimitsPageState extends State<LimitsPage> {
                             }
 
                             final double? amount =
-                                await limitsCubit.setCurrencyLimit(currency);
+                                await limitsCubit.setCurrencyLimit(
+                                    currency, userCubit.state.credentials);
 
-                            if (amount != null && amount <= 0 && context.mounted) {
+                            if (amount != null &&
+                                amount <= 0 &&
+                                context.mounted) {
                               await showDialog(
                                 context: context,
                                 builder: (BuildContext localContext) =>
                                     AlertDialog(
-                                      title: const Text(
-                                          "Invalid Limit"),
-                                      content: const Text(
-                                          "Limit must be non-zero and positive."),
-                                      actions: [
-                                        TextButton(
-                                          child: const Text("OK"),
-                                          onPressed: () =>
-                                              Navigator.of(localContext).pop(),
-                                        )
-                                      ],
-                                    ),
+                                  title: const Text("Invalid Limit"),
+                                  content: const Text(
+                                      "Limit must be non-zero and positive."),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text("OK"),
+                                      onPressed: () =>
+                                          Navigator.of(localContext).pop(),
+                                    )
+                                  ],
+                                ),
                               );
                               return;
                             }
@@ -283,7 +289,10 @@ class _RequestsPageState extends State<RequestsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<EvidenceRequestsCubit>().initialise();
+    final UserCubit userCubit = context.read<UserCubit>();
+    context
+        .read<EvidenceRequestsCubit>()
+        .initialise(userCubit.state.credentials);
   }
 
   @override
@@ -296,6 +305,8 @@ class _RequestsPageState extends State<RequestsPage> {
         .state.evidenceRequests
         .where((r) => r.status == EvidenceRequestStatus.active)
         .toList();
+
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -325,15 +336,19 @@ class _RequestsPageState extends State<RequestsPage> {
                         ),
                         const Expanded(child: SizedBox()),
                         IconButton(
-                          onPressed: () async => evidenceRequestsCubit
-                              .acceptEvidenceRequest(evidenceRequestsCubit
-                                  .state.evidenceRequests[i].evidenceRequestId),
+                          onPressed: () async =>
+                              evidenceRequestsCubit.acceptEvidenceRequest(
+                                  evidenceRequestsCubit.state
+                                      .evidenceRequests[i].evidenceRequestId,
+                                  userCubit.state.credentials),
                           icon: const Icon(Icons.check),
                         ),
                         IconButton(
-                          onPressed: () async => evidenceRequestsCubit
-                              .rejectEvidenceRequest(evidenceRequestsCubit
-                                  .state.evidenceRequests[i].evidenceRequestId),
+                          onPressed: () async =>
+                              evidenceRequestsCubit.rejectEvidenceRequest(
+                                  evidenceRequestsCubit.state
+                                      .evidenceRequests[i].evidenceRequestId,
+                                  userCubit.state.credentials),
                           icon: const Icon(Icons.close),
                         ),
                       ],

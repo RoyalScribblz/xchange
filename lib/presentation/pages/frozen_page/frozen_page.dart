@@ -25,8 +25,8 @@ class _FrozenPageState extends State<FrozenPage> {
   @override
   void initState() {
     super.initState();
-    final String userId = context.read<UserCubit>().state.user!.userId;
-    context.read<EvidenceCubit>().initialise(userId);
+    final UserCubit userCubit = context.read<UserCubit>();
+    context.read<EvidenceCubit>().initialise(userCubit.state.credentials);
   }
 
   final ImagePicker picker = ImagePicker();
@@ -35,6 +35,7 @@ class _FrozenPageState extends State<FrozenPage> {
   Widget build(BuildContext context) {
     final EvidenceCubit evidenceCubit = context.watch<EvidenceCubit>();
     final NavigatorState nav = Navigator.of(context);
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     return Scaffold(
       body: SafeArea(
@@ -175,7 +176,7 @@ class _FrozenPageState extends State<FrozenPage> {
               ContinueButton(
                 label: "Submit Evidence",
                 onPressed: () async {
-                  await evidenceCubit.submitEvidence();
+                  await evidenceCubit.submitEvidence(userCubit.state.credentials);
                   await nav.push(
                     MaterialPageRoute(
                       builder: (_) => const FrozenSubmissionPendingPage(),

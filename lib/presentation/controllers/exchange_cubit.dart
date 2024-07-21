@@ -1,3 +1,4 @@
+import "package:auth0_flutter/auth0_flutter.dart";
 import "package:collection/collection.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
@@ -89,7 +90,7 @@ class ExchangeCubit extends Cubit<ExchangeRequest> {
     );
   }
 
-  Future<bool> createExchange(String userId) async {
+  Future<bool> createExchange(Credentials? credentials) async {
     final double? amountDouble = double.tryParse(state.amount);
 
     if (amountDouble == null) {
@@ -97,7 +98,7 @@ class ExchangeCubit extends Cubit<ExchangeRequest> {
     }
 
     final PendingExchange? pendingExchange =
-        await AccountRepository.createExchange(userId, amountDouble,
+        await AccountRepository.createExchange(credentials, amountDouble,
             state.fromCurrency.currencyId, state.toCurrency.currencyId);
 
     if (pendingExchange == null) {
@@ -116,13 +117,13 @@ class ExchangeCubit extends Cubit<ExchangeRequest> {
     return true;
   }
 
-  Future<List<GetAccountsResponse>> completeExchange(String userId) async {
+  Future<List<GetAccountsResponse>> completeExchange(Credentials? credentials) async {
     if (state.pendingExchange == null) {
       return [];
     }
 
     return await AccountRepository.completeExchange(
-        userId, state.pendingExchange!.pendingExchangeId);
+        credentials, state.pendingExchange!.pendingExchangeId);
   }
 
   bool exchangeIsValid(List<GetAccountsResponse> accounts) {

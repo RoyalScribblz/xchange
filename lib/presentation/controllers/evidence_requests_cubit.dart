@@ -1,3 +1,4 @@
+import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:image_picker/image_picker.dart";
 import "package:pdfrx/pdfrx.dart";
@@ -9,9 +10,9 @@ import "cubit_models/evidence_requests_data.dart";
 class EvidenceRequestsCubit extends Cubit<EvidenceRequestsData> {
   EvidenceRequestsCubit() : super(EvidenceRequestsData([], {}, {}));
 
-  Future initialise() async {
+  Future initialise(Credentials? credentials) async {
     final List<EvidenceRequest> evidenceRequests =
-        await EvidenceRequestRepository.getEvidenceRequests();
+        await EvidenceRequestRepository.getEvidenceRequests(credentials);
 
     final Map<String, List<XFile>> files = {};
     final Map<String, PdfDocument> pdfDocuments = {};
@@ -20,7 +21,7 @@ class EvidenceRequestsCubit extends Cubit<EvidenceRequestsData> {
 
       for (String evidenceId in evidenceRequest.evidenceIds) {
         final XFile? xFile =
-            await EvidenceRequestRepository.getEvidence(evidenceId);
+            await EvidenceRequestRepository.getEvidence(evidenceId, credentials);
         if (xFile == null) {
           continue;
         }
@@ -38,9 +39,9 @@ class EvidenceRequestsCubit extends Cubit<EvidenceRequestsData> {
     emit(EvidenceRequestsData(evidenceRequests, files, pdfDocuments));
   }
 
-  Future acceptEvidenceRequest(String evidenceRequestId) async {
+  Future acceptEvidenceRequest(String evidenceRequestId, Credentials? credentials) async {
     final bool success = await EvidenceRequestRepository.acceptEvidenceRequest(
-        evidenceRequestId);
+        evidenceRequestId, credentials);
 
     if (success) {
       final List<XFile>? xFiles = state.files.remove(evidenceRequestId);
@@ -57,9 +58,9 @@ class EvidenceRequestsCubit extends Cubit<EvidenceRequestsData> {
     }
   }
 
-  Future rejectEvidenceRequest(String evidenceRequestId) async {
+  Future rejectEvidenceRequest(String evidenceRequestId, Credentials? credentials) async {
     final bool success = await EvidenceRequestRepository.rejectEvidenceRequest(
-        evidenceRequestId);
+        evidenceRequestId, credentials);
 
     if (success) {
       final List<XFile>? xFiles = state.files.remove(evidenceRequestId);

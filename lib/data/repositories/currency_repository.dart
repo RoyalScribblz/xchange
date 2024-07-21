@@ -1,5 +1,6 @@
 import "dart:convert";
 
+import "package:auth0_flutter/auth0_flutter.dart";
 import "package:http/http.dart" as http;
 
 import "../dtos/currency.dart";
@@ -24,13 +25,14 @@ class CurrencyRepository {
     return [];
   }
 
-  static Future<bool> setCurrencyLimit(String currencyId, double amount) async {
+  static Future<bool> setCurrencyLimit(String currencyId, double amount, Credentials? credentials) async {
     final response = await http.patch(
       Uri.http("10.0.2.2:5230", "currency/$currencyId/limit", {"amount": amount.toStringAsFixed(2)}),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Authorization": "Bearer ${credentials?.accessToken}",
       },
     );
 

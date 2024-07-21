@@ -5,6 +5,7 @@ import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
 import "../../controllers/deposit_cubit.dart";
+import "../../controllers/user_cubit.dart";
 import "../common/square_image.dart";
 import "../exchange_page/exchange_page.dart";
 import "../exchange_success_page/exchange_success_page.dart";
@@ -19,6 +20,7 @@ class DepositPage extends StatelessWidget {
     final NavigatorState nav = Navigator.of(context);
     final DepositCubit depositCubit = context.watch<DepositCubit>();
     final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     return Scaffold(
       body: SafeArea(
@@ -96,7 +98,8 @@ class DepositPage extends StatelessWidget {
                             onChanged: (String cardholderName) =>
                                 depositCubit.setCardholderName(cardholderName),
                             decoration: InputDecoration(
-                              label: Text("Cardholder Name", style: Fonts.neueMedium(20)),
+                              label: Text("Cardholder Name",
+                                  style: Fonts.neueMedium(20)),
                             ),
                             style: Fonts.neueLight(20),
                           ),
@@ -106,7 +109,8 @@ class DepositPage extends StatelessWidget {
                             onChanged: (String cardNumber) =>
                                 depositCubit.setCardNumber(cardNumber),
                             decoration: InputDecoration(
-                              label: Text("Card Number", style: Fonts.neueMedium(20)),
+                              label: Text("Card Number",
+                                  style: Fonts.neueMedium(20)),
                             ),
                             style: Fonts.neueLight(20),
                           ),
@@ -116,7 +120,8 @@ class DepositPage extends StatelessWidget {
                             onChanged: (String expiryDate) =>
                                 depositCubit.setExpiryDate(expiryDate),
                             decoration: InputDecoration(
-                              label: Text("Expiry Date", style: Fonts.neueMedium(20)),
+                              label: Text("Expiry Date",
+                                  style: Fonts.neueMedium(20)),
                             ),
                             style: Fonts.neueLight(20),
                           ),
@@ -126,7 +131,8 @@ class DepositPage extends StatelessWidget {
                             onChanged: (String cvvCvc) =>
                                 depositCubit.setCvvCvc(cvvCvc),
                             decoration: InputDecoration(
-                              label: Text("CVV/CVC", style: Fonts.neueMedium(20)),
+                              label:
+                                  Text("CVV/CVC", style: Fonts.neueMedium(20)),
                             ),
                             style: Fonts.neueLight(20),
                           ),
@@ -143,12 +149,16 @@ class DepositPage extends StatelessWidget {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: Text("Invalid Deposit", style: Fonts.neueMedium(15)),
-                                content: const Text("Amount to deposit must be more than 0."),
+                                title: Text("Invalid Deposit",
+                                    style: Fonts.neueMedium(15)),
+                                content: const Text(
+                                    "Amount to deposit must be more than 0."),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
-                                    child: Text("OK", style: Fonts.neueMedium(15)),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child:
+                                        Text("OK", style: Fonts.neueMedium(15)),
                                   ),
                                 ],
                               );
@@ -164,12 +174,15 @@ class DepositPage extends StatelessWidget {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: Text("Invalid Input", style: Fonts.neueMedium(15)),
+                                title: Text("Invalid Input",
+                                    style: Fonts.neueMedium(15)),
                                 content: Text(validation),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
-                                    child: Text("OK", style: Fonts.neueMedium(15)),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child:
+                                        Text("OK", style: Fonts.neueMedium(15)),
                                   ),
                                 ],
                               );
@@ -179,14 +192,17 @@ class DepositPage extends StatelessWidget {
                         }
 
                         final bool success = await accountsCubit.deposit(
-                            account.accountId, depositCubit.state.amount);
+                            account.accountId,
+                            depositCubit.state.amount,
+                            userCubit.state.credentials);
 
                         if (success) {
                           await nav.push(
                             MaterialPageRoute(
                               builder: (_) => SuccessPage(
                                 mainText: "Deposit Successful",
-                                subText: "${account.currency.symbol}${depositCubit.state.amount.toStringAsFixed(2)} ${account.currency.currencyCode}",
+                                subText:
+                                    "${account.currency.symbol}${depositCubit.state.amount.toStringAsFixed(2)} ${account.currency.currencyCode}",
                               ),
                             ),
                           );
@@ -198,11 +214,13 @@ class DepositPage extends StatelessWidget {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: Text("ERROR", style: Fonts.neueMedium(15)),
+                                title:
+                                    Text("ERROR", style: Fonts.neueMedium(15)),
                                 actions: [
                                   TextButton(
                                     onPressed: () {},
-                                    child: Text("OK", style: Fonts.neueMedium(15)),
+                                    child:
+                                        Text("OK", style: Fonts.neueMedium(15)),
                                   ),
                                 ],
                               );

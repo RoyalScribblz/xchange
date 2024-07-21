@@ -10,17 +10,17 @@ class UserCubit extends Cubit<User> {
   UserCubit() : super(User(null, null, null));
 
   Future login(Credentials credentials, Auth0 auth0) async {
-    GetUserResponse? user = await UserRepository.getUser(credentials.user.sub);
+    GetUserResponse? user = await UserRepository.getUser(credentials);
 
-    user ??= await UserRepository.createUser(credentials.user.sub);
+    user ??= await UserRepository.createUser(credentials);
 
     emit(User(credentials, user, auth0));
   }
 
   Future updateLocalCurrency(String currencyId) async {
     final Currency? currency = await UserRepository.setLocalCurrency(
-      state.credentials!.user.sub,
       currencyId,
+      state.credentials
     );
 
     if (currency == null || state.user == null) {

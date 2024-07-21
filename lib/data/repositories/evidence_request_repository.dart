@@ -1,6 +1,7 @@
 import "dart:convert";
 import "dart:io";
 
+import "package:auth0_flutter/auth0_flutter.dart";
 import "package:image_picker/image_picker.dart";
 import "package:http_parser/http_parser.dart";
 
@@ -11,7 +12,7 @@ import "package:path_provider/path_provider.dart";
 import "../dtos/evidence_request.dart";
 
 class EvidenceRequestRepository {
-  static Future submitEvidence(String evidenceId, List<XFile> xFiles) async {
+  static Future submitEvidence(String evidenceId, List<XFile> xFiles, Credentials? credentials) async {
     final request = http.MultipartRequest(
       "PATCH",
       Uri.http("10.0.2.2:5230", "evidenceRequest/$evidenceId/evidence"),
@@ -33,18 +34,20 @@ class EvidenceRequestRepository {
     request.headers.addAll({
       "Access-Control-Allow-Origin": "*",
       "Accept": "*/*",
+      "Authorization": "Bearer ${credentials?.accessToken}",
     });
 
     await request.send();
   }
 
-  static Future<EvidenceRequest?> getEvidenceRequest(String userId) async {
+  static Future<EvidenceRequest?> getEvidenceRequest(Credentials? credentials) async {
     final response = await http.get(
-      Uri.http("10.0.2.2:5230", "evidenceRequest", {"userId": userId}),
+      Uri.http("10.0.2.2:5230", "evidenceRequest"),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Authorization": "Bearer ${credentials?.accessToken}",
       },
     );
 
@@ -55,13 +58,14 @@ class EvidenceRequestRepository {
     return null;
   }
 
-  static Future<List<EvidenceRequest>> getEvidenceRequests() async {
+  static Future<List<EvidenceRequest>> getEvidenceRequests(Credentials? credentials) async {
     final response = await http.get(
       Uri.http("10.0.2.2:5230", "evidenceRequests"),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Authorization": "Bearer ${credentials?.accessToken}",
       },
     );
 
@@ -74,7 +78,7 @@ class EvidenceRequestRepository {
     return [];
   }
 
-  static Future<XFile?> getEvidence(String evidenceId) async {
+  static Future<XFile?> getEvidence(String evidenceId, Credentials? credentials) async {
     final Directory directory = await getTemporaryDirectory();  // TODO clear this directory
     final File file = File("${directory.path}/$evidenceId");
 
@@ -82,7 +86,8 @@ class EvidenceRequestRepository {
       Uri.http("10.0.2.2:5230", "evidence/$evidenceId"),
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Authorization": "Bearer ${credentials?.accessToken}",
       },
     );
 
@@ -98,26 +103,28 @@ class EvidenceRequestRepository {
     return null;
   }
 
-  static Future<bool> acceptEvidenceRequest(String evidenceRequestId) async {
+  static Future<bool> acceptEvidenceRequest(String evidenceRequestId, Credentials? credentials) async {
     final response = await http.post(
       Uri.http("10.0.2.2:5230", "evidenceRequest/$evidenceRequestId/accept"),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Authorization": "Bearer ${credentials?.accessToken}",
       },
     );
 
     return response.statusCode == 200;
   }
 
-  static Future<bool> rejectEvidenceRequest(String evidenceRequestId) async {
+  static Future<bool> rejectEvidenceRequest(String evidenceRequestId, Credentials? credentials) async {
     final response = await http.post(
       Uri.http("10.0.2.2:5230", "evidenceRequest/$evidenceRequestId/reject"),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
-        "Accept": "*/*"
+        "Accept": "*/*",
+        "Authorization": "Bearer ${credentials?.accessToken}",
       },
     );
 

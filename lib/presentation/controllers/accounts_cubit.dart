@@ -1,3 +1,4 @@
+import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:collection/collection.dart";
 
@@ -7,17 +8,17 @@ import "../../data/repositories/account_repository.dart";
 class AccountsCubit extends Cubit<List<GetAccountsResponse>> {
   AccountsCubit() : super([]);
 
-  Future update(String userId) async {
-    emit(await AccountRepository.getAccounts(userId));
+  Future update(Credentials? credentials) async {
+    emit(await AccountRepository.getAccounts(credentials));
   }
 
   void set(List<GetAccountsResponse> accounts) {
     emit([...accounts]);
   }
 
-  Future<bool> deposit(String accountId, double amount) async {
+  Future<bool> deposit(String accountId, double amount, Credentials? credentials) async {
     final GetAccountsResponse? response =
-        await AccountRepository.deposit(accountId, amount);
+        await AccountRepository.deposit(accountId, amount, credentials);
 
     if (response == null) {
       return false;
@@ -31,9 +32,9 @@ class AccountsCubit extends Cubit<List<GetAccountsResponse>> {
     return true;
   }
 
-  Future<bool> withdraw(String accountId, double amount) async {
+  Future<bool> withdraw(String accountId, double amount, Credentials? credentials) async {
     final GetAccountsResponse? response =
-        await AccountRepository.withdraw(accountId, amount);
+        await AccountRepository.withdraw(accountId, amount, credentials);
 
     if (response == null) {
       return false;
@@ -58,9 +59,9 @@ class AccountsCubit extends Cubit<List<GetAccountsResponse>> {
     return account.balance;
   }
 
-  Future createAccount(String userId, String currencyId) async {
+  Future createAccount(Credentials? credentials, String currencyId) async {
     final GetAccountsResponse? account =
-        await AccountRepository.create(userId, currencyId);
+        await AccountRepository.create(credentials, currencyId);
 
     if (account == null) {
       return;

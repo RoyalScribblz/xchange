@@ -4,6 +4,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
 import "../../controllers/accounts_cubit.dart";
+import "../../controllers/user_cubit.dart";
 import "../../controllers/withdraw_cubit.dart";
 import "../common/square_image.dart";
 import "../exchange_page/exchange_page.dart";
@@ -19,6 +20,7 @@ class WithdrawPage extends StatelessWidget {
     final NavigatorState nav = Navigator.of(context);
     final WithdrawCubit withdrawCubit = context.watch<WithdrawCubit>();
     final AccountsCubit accountsCubit = context.watch<AccountsCubit>();
+    final UserCubit userCubit = context.watch<UserCubit>();
 
     return Scaffold(
       body: SafeArea(
@@ -175,7 +177,7 @@ class WithdrawPage extends StatelessWidget {
                 }
 
                 final bool success = await accountsCubit.withdraw(
-                    account.accountId, withdrawCubit.state.amount);
+                    account.accountId, withdrawCubit.state.amount, userCubit.state.credentials);
 
                 if (success) {
                   await nav.push(

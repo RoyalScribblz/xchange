@@ -51,10 +51,10 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                       onPressed: () async {
                         final credentials =
-                            await auth0.webAuthentication(scheme: "xchange").login();
+                            await auth0.webAuthentication(scheme: "xchange").login(audience: "http://localhost:5230");
 
                         await userCubit.login(credentials, auth0);
-                        await evidenceCubit.initialise(userCubit.state.user!.userId);
+                        await evidenceCubit.initialise(userCubit.state.credentials);
                       },
                       child: Text("Login", style: Fonts.neueMedium(20)),
                     ),

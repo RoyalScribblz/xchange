@@ -1,3 +1,4 @@
+import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
@@ -45,7 +46,7 @@ class LimitsCubit extends Cubit<LimitsData> {
     return filtered;
   }
 
-  Future<double?> setCurrencyLimit(Currency currency) async {
+  Future<double?> setCurrencyLimit(Currency currency, Credentials? credentials) async {
     final int index = state.currencies.indexOf(currency);
     final double? amount = double.tryParse(state.controllers[index].text);
 
@@ -53,7 +54,7 @@ class LimitsCubit extends Cubit<LimitsData> {
       return null;
     }
 
-    final bool success = await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
+    final bool success = await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount, credentials);
 
     if (success) {
       state.currencies[index] = Currency(
@@ -73,7 +74,7 @@ class LimitsCubit extends Cubit<LimitsData> {
     return null;
   }
 
-  Future<Map<String, String>> setCurrencyLimits() async {
+  Future<Map<String, String>> setCurrencyLimits(Credentials? credentials) async {
     final Map<String, String> changedValues = {};
 
     for (int i = 0; i < state.currencies.length; i++) {
@@ -89,7 +90,7 @@ class LimitsCubit extends Cubit<LimitsData> {
         continue;
       }
 
-      final bool success = await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount);
+      final bool success = await CurrencyRepository.setCurrencyLimit(currency.currencyId, amount, credentials);
 
       if (success) {
         state.currencies[i] = Currency(

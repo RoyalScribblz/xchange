@@ -272,7 +272,7 @@ class ExchangePage extends StatelessWidget {
                 }
 
                 final bool success = await exchangeCubit
-                    .createExchange(userCubit.state.user!.userId);
+                    .createExchange(userCubit.state.credentials);
 
                 if (success == false) {
                   return;

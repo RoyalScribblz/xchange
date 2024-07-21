@@ -1,3 +1,4 @@
+import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:image_picker/image_picker.dart";
 import "package:pdfrx/pdfrx.dart";
@@ -74,9 +75,9 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
         state.evidenceRequest, state.images, state.pdfs, state.pdfDocuments));
   }
 
-  Future initialise(String userId) async {
+  Future initialise(Credentials? credentials) async {
     final evidenceRequest =
-        await EvidenceRequestRepository.getEvidenceRequest(userId);
+        await EvidenceRequestRepository.getEvidenceRequest(credentials);
 
     if (evidenceRequest != null) {
       emit(EvidenceSubmission(
@@ -88,10 +89,11 @@ class EvidenceCubit extends Cubit<EvidenceSubmission> {
     }
   }
 
-  Future submitEvidence() async {
+  Future submitEvidence(Credentials? credentials) async {
     await EvidenceRequestRepository.submitEvidence(
       state.evidenceRequest!.evidenceRequestId,
       [...state.images, ...state.pdfs],
+      credentials,
     );
   }
 }

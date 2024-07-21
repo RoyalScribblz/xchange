@@ -129,7 +129,7 @@ class ExchangePreviewPage extends StatelessWidget {
             ContinueButton(
               label: "Exchange Now",
               onPressed: () async {
-                final List<GetAccountsResponse> accounts = await exchangeCubit.completeExchange(userCubit.state.user!.userId);
+                final List<GetAccountsResponse> accounts = await exchangeCubit.completeExchange(userCubit.state.credentials);
 
                 if (accounts.isEmpty) {
                   return;
@@ -137,7 +137,7 @@ class ExchangePreviewPage extends StatelessWidget {
 
                 accountsCubit.set(accounts);
 
-                final EvidenceRequest? evidenceRequest = await EvidenceRequestRepository.getEvidenceRequest(userCubit.state.user!.userId);
+                final EvidenceRequest? evidenceRequest = await EvidenceRequestRepository.getEvidenceRequest(userCubit.state.credentials);
 
                 await nav.push(
                   MaterialPageRoute(

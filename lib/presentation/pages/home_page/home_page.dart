@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     final UserCubit userCubit = context.read<UserCubit>();
-    context.read<AccountsCubit>().update(userCubit.state.user!.userId);
+    context.read<AccountsCubit>().update(userCubit.state.credentials);
     context.read<CurrenciesCubit>().update();
   }
 
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                   alignment: Alignment.centerRight,
                   child: PopupMenuButton<Currency>(
                     icon: const Icon(Icons.add),
-                    onSelected: (currency) => accountsCubit.createAccount(userCubit.state.user!.userId, currency.currencyId),
+                    onSelected: (currency) => accountsCubit.createAccount(userCubit.state.credentials, currency.currencyId),
                     itemBuilder: (_) {
                       return currenciesCubit.state
                           .map(
