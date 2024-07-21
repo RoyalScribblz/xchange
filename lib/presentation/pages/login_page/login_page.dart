@@ -1,6 +1,7 @@
 import "package:auth0_flutter/auth0_flutter.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:local_auth/local_auth.dart" as local_auth;
 
 import "../../../data/dtos/evidence_request.dart";
 import "../../../extensions/credentials_extensions.dart";
@@ -22,6 +23,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   late Auth0 auth0;
+  final local_auth.LocalAuthentication localAuth =
+      local_auth.LocalAuthentication();
+
+  bool locallyAuthenticated = false;
 
   @override
   void initState() {
@@ -30,12 +35,55 @@ class _LoginPageState extends State<LoginPage> {
       "dev-0zt0kwgn6ocwlua2.uk.auth0.com",
       "dgGpth3lChxHUBnfBIoivOtmm3k2MHJo",
     );
+
+    biometricAuthenticate();
+  }
+
+  Future biometricAuthenticate() async {
+    final List<local_auth.BiometricType> biometrics =
+        await localAuth.getAvailableBiometrics();
+
+    if (biometrics.isEmpty) {
+      return;
+    }
+
+    try {
+      final bool success = await localAuth.authenticate(
+          localizedReason: "Please authenticate to access the application");
+      setState(() => locallyAuthenticated = success);
+    } on Exception {
+      setState(() => locallyAuthenticated = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final UserCubit userCubit = context.watch<UserCubit>();
     final EvidenceCubit evidenceCubit = context.watch<EvidenceCubit>();
+
+    if (locallyAuthenticated == false) {
+      return Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Xchange", style: Fonts.neueLight(50)),
+                    ElevatedButton(
+                      onPressed: () async => await biometricAuthenticate(),
+                      child: Text("Login", style: Fonts.neueMedium(20)),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
 
     if (userCubit.state.credentials == null) {
       return Scaffold(
@@ -50,11 +98,13 @@ class _LoginPageState extends State<LoginPage> {
                     Text("Xchange", style: Fonts.neueLight(50)),
                     ElevatedButton(
                       onPressed: () async {
-                        final credentials =
-                            await auth0.webAuthentication(scheme: "xchange").login(audience: "http://localhost:5230");
+                        final credentials = await auth0
+                            .webAuthentication(scheme: "xchange")
+                            .login(audience: "http://localhost:5230");
 
                         await userCubit.login(credentials, auth0);
-                        await evidenceCubit.initialise(userCubit.state.credentials);
+                        await evidenceCubit
+                            .initialise(userCubit.state.credentials);
                       },
                       child: Text("Login", style: Fonts.neueMedium(20)),
                     ),
@@ -78,15 +128,21 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    if (evidenceCubit.state.evidenceRequest != null && evidenceCubit.state.evidenceRequest?.status == EvidenceRequestStatus.rejected) {
+    if (evidenceCubit.state.evidenceRequest != null &&
+        evidenceCubit.state.evidenceRequest?.status ==
+            EvidenceRequestStatus.rejected) {
       return const BannedPage();
     }
 
-    if (evidenceCubit.state.evidenceRequest != null && evidenceCubit.state.evidenceRequest?.status == EvidenceRequestStatus.active) {
+    if (evidenceCubit.state.evidenceRequest != null &&
+        evidenceCubit.state.evidenceRequest?.status ==
+            EvidenceRequestStatus.active) {
       return const FrozenSubmissionPendingPage();
     }
 
-    if (evidenceCubit.state.evidenceRequest != null && evidenceCubit.state.evidenceRequest?.status == EvidenceRequestStatus.waiting) {
+    if (evidenceCubit.state.evidenceRequest != null &&
+        evidenceCubit.state.evidenceRequest?.status ==
+            EvidenceRequestStatus.waiting) {
       return const FrozenPage();
     }
 

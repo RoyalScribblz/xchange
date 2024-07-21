@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:local_auth/local_auth.dart";
 
 import "../../../data/contracts/get_accounts_response.dart";
 import "../../../fonts.dart";
@@ -11,9 +12,10 @@ import "../exchange_page/exchange_page.dart";
 import "../exchange_success_page/exchange_success_page.dart";
 
 class WithdrawPage extends StatelessWidget {
-  const WithdrawPage({super.key, required this.account});
+  WithdrawPage({super.key, required this.account});
 
   final GetAccountsResponse account;
+  final LocalAuthentication localAuth = LocalAuthentication();
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +119,25 @@ class WithdrawPage extends StatelessWidget {
             ContinueButton(
               label: "Confirm Withdrawal",
               onPressed: () async {
-                if (withdrawCubit.state.amount > account.balance) {
+                final List<BiometricType> biometrics =
+                await localAuth.getAvailableBiometrics();
+
+                if (biometrics.isEmpty) {
+                  return;
+                }
+
+                try {
+                  final bool success = await localAuth.authenticate(
+                      localizedReason: "Please authenticate to complete withdrawal");
+
+                  if (!success) {
+                    return;
+                  }
+                } on Exception {
+                  return;
+                }
+
+                if (withdrawCubit.state.amount > account.balance && context.mounted) {
                   await showDialog(
                     context: context,
                     builder: (context) {
@@ -136,7 +156,7 @@ class WithdrawPage extends StatelessWidget {
                   return;
                 }
 
-                if (withdrawCubit.state.amount <= 0) {
+                if (withdrawCubit.state.amount <= 0 && context.mounted) {
                   await showDialog(
                     context: context,
                     builder: (context) {
@@ -157,7 +177,7 @@ class WithdrawPage extends StatelessWidget {
 
                 final validation = withdrawCubit.validate();
 
-                if (validation.isNotEmpty) {
+                if (validation.isNotEmpty && context.mounted) {
                   await showDialog(
                     context: context,
                     builder: (context) {
