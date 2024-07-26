@@ -1,5 +1,6 @@
 import "dart:core";
 
+import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
@@ -193,10 +194,10 @@ class CurrencyTile extends StatelessWidget {
                           create: (_) => ExchangeCubit(
                             account.currency,
                             accountsCubit.state
-                                .singleWhere((a) =>
+                                .singleWhereOrNull((a) =>
                                     a.currency.currencyId ==
                                     userCubit.state.user!.localCurrency.currencyId)
-                                .currency,
+                                ?.currency ?? accountsCubit.state.first.currency,
                           ),
                           child: const ExchangePage(),
                         ),
